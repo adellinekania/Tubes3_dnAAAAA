@@ -21,6 +21,19 @@ type TesDNAResults struct {
 	Data    []bson.M
 }
 
+type Tes struct {
+    Message string
+}
+
+func ApiTest(response http.ResponseWriter, request *http.Request) {
+	response.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(response).Encode(Tes{
+		Message: "Successfully get tes DNA",
+	})
+
+}
+
 func GetAllTesDNA(response http.ResponseWriter, request *http.Request) {
 
 	vars := mux.Vars(request)

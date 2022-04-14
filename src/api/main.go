@@ -36,7 +36,8 @@ func main() {
 	router.HandleFunc("/api/tesDNA", handler.CreateTesDNA).Methods("POST")
 	router.HandleFunc("/api/tesDNA", handler.GetAllTesDNA).Methods("GET")
 	router.HandleFunc("/api/tesDNA/{query}", handler.GetAllTesDNA).Methods("GET")
-	err = http.ListenAndServe(":8080", router)
+	router.HandleFunc("/api/test", handler.ApiTest).Methods("GET")
+	err = http.ListenAndServe(":3000", router)
 	if err != nil {
 		fmt.Println(err)
 	}
