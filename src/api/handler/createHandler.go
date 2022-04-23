@@ -75,11 +75,12 @@ func CreatePenyakit(response http.ResponseWriter, request *http.Request) {
 }
 
 type TesDNAFields struct {
-	Nama_pengguna     string
-	Sequence_dna      string
-	Prediksi_penyakit string
-	Tanggal           string
-	Hasil_tes         bool
+	Nama_pengguna        string
+	Sequence_dna         string
+	Prediksi_penyakit    string
+	Tanggal              string
+	Hasil_tes            bool
+	Persentase_kemiripan float64
 }
 
 type TesDNAResult struct {
@@ -96,6 +97,7 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 	file, _, err := request.FormFile("sequenceDNA")
 	namaPengguna := request.FormValue("namaPengguna")
 	prediksiPenyakit := request.FormValue("prediksiPenyakit")
+	metodeStringMatching := request.FormValue("metodeStringMatching")
 
 	if err != nil {
 		fmt.Println(err)
@@ -134,15 +136,35 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 
 	dnaSequencePenyakit := penyakitBson["sequence_dna"].(string)
 
-	isMatch, startingIndexFound, comparisonCount := stringmatching.StringMatching(dnaSequencePenyakit, dnaSequencePasien)
+	var isMatch bool
+	var startingIndexFound int
+	var comparisonCount int
+	var matchPercentage float64
+
+	if metodeStringMatching == "KMP" {
+		isMatch, startingIndexFound, comparisonCount = stringmatching.StringMatching(dnaSequencePenyakit, dnaSequencePasien)
+		matchPercentage = 1
+	} else if metodeStringMatching == "BM" {
+		isMatch, startingIndexFound, comparisonCount = stringmatching.BmStringMatching(dnaSequencePenyakit, dnaSequencePasien)
+		matchPercentage = 1
+	}
+
+	if !isMatch {
+		matchPercentage = stringmatching.SequenceSimilarity(dnaSequencePenyakit, dnaSequencePasien)
+
+		if matchPercentage > 0.8 {
+			isMatch = true
+		}
+	}
 
 	fmt.Println("Successfully created collection. ", reflect.TypeOf(tesDNACollections))
 	oneDoc := TesDNAFields{
-		Nama_pengguna:     namaPengguna,
-		Sequence_dna:      dnaSequencePasien,
-		Prediksi_penyakit: prediksiPenyakit,
-		Tanggal:           tanggal,
-		Hasil_tes:         isMatch,
+		Nama_pengguna:        namaPengguna,
+		Sequence_dna:         dnaSequencePasien,
+		Prediksi_penyakit:    prediksiPenyakit,
+		Tanggal:              tanggal,
+		Hasil_tes:            isMatch,
+		Persentase_kemiripan: matchPercentage,
 	}
 
 	result, insertErr := tesDNACollections.InsertOne(context.TODO(), oneDoc)
