@@ -15,17 +15,23 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Struct untuk menyimpan data penyakit yang dibuat
 type PenyakitFields struct {
 	Nama_penyakit string
 	Sequence_dna  string
 }
 
+// Struct untuk menyimpan data result dari respons
+// yang akan diberikan ketika melakukan pembuatan data penyakit
 type PenyakitResult struct {
 	Message string
 	Data    PenyakitFields
 }
 
+// Handler yang digunakan untuk membuat penyakit baru
 func CreatePenyakit(response http.ResponseWriter, request *http.Request) {
+	// Mengambil body, berupa data namaPenyakit dan sequenceDNA yang tersimpan dalam file,
+	// dari request dengan ukuran maksimal 10 * 1024 * 1024 bytes
 	request.ParseMultipartForm(10 * 1024 * 1024)
 	file, _, err := request.FormFile("sequenceDNA")
 	namaPenyakit := request.FormValue("namaPenyakit")
@@ -37,18 +43,21 @@ func CreatePenyakit(response http.ResponseWriter, request *http.Request) {
 
 	defer file.Close()
 
+	// Membaca sequence DNA dan mengecek apakah sequence DNA yang dibaca valid atau tidak
 	isValid, dnaSequence := regex.ValidateDNASequence(file)
 
+	// Jika tidak valid akan langsung mereturn respons berupa pesan error "Sequence DNA tidak valid"
 	response.Header().Set("Content-Type", "application/json")
 
 	if !isValid {
 		response.WriteHeader(http.StatusExpectationFailed)
 		json.NewEncoder(response).Encode(PenyakitResult{
-			Message: "Penyakit ga valid",
+			Message: "Sequence DNA tidak valid",
 		})
 		return
 	}
 
+	// Jika valid maka data penyakit akan dibuat dan disimpan ke database
 	const uri = "mongodb+srv://tubes-stima-dnAAAAA:tubes-stima-dnAAAAA@cluster0.lis3q.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
@@ -67,6 +76,7 @@ func CreatePenyakit(response http.ResponseWriter, request *http.Request) {
 		fmt.Println("Inserted a single document: ", reflect.TypeOf(result))
 	}
 
+	// Mengirimkan respons berupa pesan sukses dan data penyakit yang dibuat
 	response.WriteHeader(http.StatusCreated)
 	json.NewEncoder(response).Encode(PenyakitResult{
 		Message: "Successfully created penyakit",
@@ -74,6 +84,7 @@ func CreatePenyakit(response http.ResponseWriter, request *http.Request) {
 	})
 }
 
+// Struct untuk menyimpan data tes DNA yang dibuat
 type TesDNAFields struct {
 	Nama_pengguna        string
 	Sequence_dna         string
@@ -83,6 +94,8 @@ type TesDNAFields struct {
 	Persentase_kemiripan float64
 }
 
+// Struct untuk menyimpan data result dari respons
+// yang akan diberikan ketika melakukan pembuatan tes DNA
 type TesDNAResult struct {
 	Message            string
 	Data               TesDNAFields
@@ -91,13 +104,15 @@ type TesDNAResult struct {
 }
 
 func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
-	tanggal := time.Now().Format("02 January 2006")
-
+	// Mengambil body, berupa data namaPegguna, prediksiPenyakit, dan sequenceDNA
+	// yang tersimpan dalam file, dari request dengan ukuran maksimal 10 * 1024 * 1024 bytes
 	request.ParseMultipartForm(10 * 1024 * 1024)
 	file, _, err := request.FormFile("sequenceDNA")
 	namaPengguna := request.FormValue("namaPengguna")
 	prediksiPenyakit := request.FormValue("prediksiPenyakit")
 	metodeStringMatching := request.FormValue("metodeStringMatching")
+
+	tanggal := time.Now().Format("02 January 2006")
 
 	if err != nil {
 		fmt.Println(err)
@@ -106,17 +121,20 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 
 	defer file.Close()
 
+	// Membaca sequence DNA dan mengecek apakah sequence DNA yang dibaca valid atau tidak
 	isValid, dnaSequencePasien := regex.ValidateDNASequence(file)
 
+	// Jika tidak valid akan langsung mereturn respons berupa pesan error "Sequence DNA pasien tidak valid"
 	response.Header().Set("Content-Type", "application/json")
 	if !isValid {
 		response.WriteHeader(http.StatusExpectationFailed)
 		json.NewEncoder(response).Encode(TesDNAResult{
-			Message: "DNA PAsien ga valid",
+			Message: "Sequence DNA pasien tidak valid",
 		})
 		return
 	}
 
+	// Jika valid maka data tes DNA akan dibuat dan disimpan ke database
 	const uri = "mongodb+srv://tubes-stima-dnAAAAA:tubes-stima-dnAAAAA@cluster0.lis3q.mongodb.net/myFirstDatabase?retryWrites=true&w=majority"
 
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
@@ -124,16 +142,19 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 	penyakitCollections := client.Database("dna").Collection("penyakit")
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
+	// Mengambil data penyakit yang sesuai dengan prediksi penyakit
 	var penyakitBson bson.M
 	if err := penyakitCollections.FindOne(ctx, bson.M{"nama_penyakit": prediksiPenyakit}).Decode(&penyakitBson); err != nil {
-		// File ga ketemu
+		// Apabila tidak terdapat data penyakit maka akan langsung
+		// mereturn respons berupa pesan error "Data penyakit tidak ditemukan"
 		response.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(response).Encode(TesDNAResult{
-			Message: "Penyakit tidak ditemukan",
+			Message: "Data penyakit tidak ditemukan",
 		})
 		return
 	}
 
+	// Sequence DNA penyakit akan diambil dari data penyakit yang ditemukan
 	dnaSequencePenyakit := penyakitBson["sequence_dna"].(string)
 
 	var isMatch bool
@@ -141,6 +162,9 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 	var comparisonCount int
 	var matchPercentage float64
 
+	// Memeriksa apakah sequence DNA pasien sama dengan sequence DNA penyakit
+
+	// Menggunakan metode KMP atau BM
 	if metodeStringMatching == "KMP" {
 		isMatch, startingIndexFound, comparisonCount = stringmatching.StringMatching(dnaSequencePenyakit, dnaSequencePasien)
 		matchPercentage = 1
@@ -149,6 +173,8 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 		matchPercentage = 1
 	}
 
+	// Jika sequence DNA pasien dan penyakit tidak sama
+	// maka akan ditentukan persentase kemiripannya
 	if !isMatch {
 		matchPercentage = stringmatching.SequenceSimilarity(dnaSequencePenyakit, dnaSequencePasien)
 
@@ -174,6 +200,7 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 		fmt.Println("Inserted a single document: ", reflect.TypeOf(result))
 	}
 
+	// Mengirimkan respons berupa pesan sukses dan data penyakit yang dibuat
 	response.WriteHeader(http.StatusCreated)
 
 	json.NewEncoder(response).Encode(TesDNAResult{

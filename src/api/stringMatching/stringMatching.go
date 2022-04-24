@@ -12,7 +12,7 @@ func BorderFunction(inputPattern string) []int {
 	b[1] = 0
 	for i := 2; i < inputPatternLength; i++ {
 		pattern := string(inputPattern[0:i])
-		// log.Println("PATTERN", pattern)
+
 		maxLength := 0
 		patternLength := len(pattern)
 		for j := 0; j < patternLength-1; j++ {
@@ -28,7 +28,6 @@ func BorderFunction(inputPattern string) []int {
 }
 
 func StringMatching(inputPattern string, inputText string) (bool, int, int) {
-	fmt.Println("KMP")
 	b := BorderFunction(inputPattern)
 	lenInputPattern := len(inputPattern)
 	lenInputText := len(inputText)

@@ -16,6 +16,7 @@ const uri = "mongodb+srv://tubes-stima-dnAAAAA:tubes-stima-dnAAAAA@cluster0.lis3
 
 func main() {
 
+	// Melakukan koneksi ke mongoose database
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)
@@ -31,6 +32,7 @@ func main() {
 	}
 	fmt.Println("Successfully connected and pinged.")
 
+	// Membuat router
 	router := mux.NewRouter()
 	router.HandleFunc("/api/upload", handler.CreatePenyakit).Methods("POST")
 	router.HandleFunc("/api/tesDNA", handler.CreateTesDNA).Methods("POST")
