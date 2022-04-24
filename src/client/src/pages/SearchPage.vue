@@ -38,7 +38,7 @@ const handleClick = () => {
 };
 
 const listPenyakit = reactive([]);
-onMounted(() => {
+onMounted(async () => {
   // API call...
   for (let i = 1; i <= 50; i++) {
     listPenyakit.push({

@@ -19,8 +19,9 @@ const result = reactive({
   isLoading: true,
 });
 
-onMounted(() => {
+onMounted(async () => {
   // API call
+  // const dnaSequence = await store.data.file.file.text();
   setTimeout(() => {
     result.isLoading = false;
     result.nama = store.data.nama;
