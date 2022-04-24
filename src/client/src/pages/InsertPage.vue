@@ -1,9 +1,48 @@
 <script setup>
+import { onMounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   NCard, NForm, NFormItem, NInput, NButton, NIcon,
 } from 'naive-ui';
+
 import InlineFileInput from '@/components/form/InlineFileInput.vue';
 import SearchIcon from '@/assets/icons/Add.svg';
+import { useStore } from '@/stores/insert';
+
+const store = useStore();
+const input = reactive(store.data);
+
+const rules = {
+  penyakit: {
+    required: true,
+    message: 'Nama penyakit harus diisi',
+  },
+  file: {
+    required: true,
+    message: 'File DNA harus dipilih',
+  },
+};
+
+const formRef = ref(null);
+const router = useRouter();
+
+const handleClick = () => {
+  formRef.value?.validate()
+    .then(() => router.push({ name: 'post' }))
+    .catch(() => {});
+};
+
+const listPenyakit = reactive([]);
+
+onMounted(() => {
+  // API call...
+  for (let i = 1; i <= 50; i++) {
+    listPenyakit.push({
+      label: `Penyakit ${i}`,
+      value: `penyakit${i}`,
+    });
+  }
+});
 </script>
 
 <template>
@@ -16,15 +55,26 @@ import SearchIcon from '@/assets/icons/Add.svg';
       }"
       class="insert-form-box"
     >
-      <NForm>
-        <NFormItem label="Nama Penyakit">
+      <NForm
+        ref="formRef"
+        :model="input"
+        :rules="rules"
+      >
+        <NFormItem
+          label="Nama Penyakit"
+          path="penyakit"
+        >
           <NInput
+            v-model:value="input.penyakit"
             placeholder="Masukkan nama penyakit"
             size="large"
           />
         </NFormItem>
-        <NFormItem label="File Sequence DNA">
-          <InlineFileInput />
+        <NFormItem
+          label="File Sequence DNA"
+          path="file"
+        >
+          <InlineFileInput v-model:value="input.file" />
         </NFormItem>
       </NForm>
       <template #action>
@@ -32,6 +82,7 @@ import SearchIcon from '@/assets/icons/Add.svg';
           <NButton
             type="info"
             size="large"
+            @click="handleClick"
           >
             <template #icon>
               <NIcon>

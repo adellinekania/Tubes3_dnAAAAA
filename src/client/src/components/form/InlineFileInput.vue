@@ -1,34 +1,66 @@
 <script setup>
 import {
-  NUpload, NUploadTrigger, NInputGroup, NInputGroupLabel, NButton, NText,
+  NUpload, NUploadTrigger, NInputGroup, NButton, NInput,
 } from 'naive-ui';
+import { ref, computed } from 'vue';
 
-const emit = defineEmits(['change']);
+const emit = defineEmits(['change', 'update:value']);
+
+const props = defineProps({
+  value: {
+    type: Object,
+    default: null,
+  },
+});
+
+const fileList = ref([]);
+
+const handleListChange = (list) => {
+  if (list.length > 1) {
+    list.shift();
+  }
+
+  fileList.value = [list.pop()];
+};
+
+const handleChange = (file) => {
+  emit('update:value', file.file);
+  emit('change', file.file);
+};
+
+if (props.value != null) {
+  fileList.value.push(props.value);
+}
+
+const filename = computed(() => {
+  if (fileList.value.length === 0) {
+    return null;
+  }
+
+  return fileList.value[0].name;
+});
+
 </script>
 
 <template>
   <NUpload
+    :file-list="fileList"
     abstract
     :show-file-list="false"
-    :max="1"
-    @change="emit('change', $event)"
+    @change="handleChange"
+    @update:file-list="handleListChange"
   >
     <NUploadTrigger
       #="{ handleClick }"
       abstract
     >
-      <NInputGroup>
-        <NInputGroupLabel
+      <NInputGroup style="display: flex; max-width: 100%;">
+        <NInput
+          placeholder="Pilih file..."
           size="large"
-          style="width: 100%;"
-        >
-          <NText
-            :depth="3"
-            italic
-          >
-            Pilih file...
-          </NText>
-        </NInputGroupLabel>
+          :value="filename"
+          @change.prevent
+        />
         <NButton
           type="primary"
           size="large"

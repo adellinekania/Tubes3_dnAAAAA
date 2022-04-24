@@ -21,6 +21,7 @@ module.exports = {
   rules: {
     'vue/script-setup-uses-vars': 'error',
     'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
+    'import/prefer-default-export': 'off',
   },
   settings: {
     'import/resolver': {

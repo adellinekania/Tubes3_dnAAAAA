@@ -1,9 +1,53 @@
 <script setup>
+import { onMounted, reactive, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import {
-  NCard, NForm, NFormItem, NInput, NButton, NIcon,
+  NCard, NForm, NFormItem, NInput, NSelect, NButton, NIcon,
 } from 'naive-ui';
+
 import InlineFileInput from '@/components/form/InlineFileInput.vue';
 import SearchIcon from '@/assets/icons/Search.svg';
+import { useStore as useSearchStore } from '@/stores/search';
+
+const searchStore = useSearchStore();
+
+const input = reactive(searchStore.data);
+
+const rules = {
+  nama: {
+    required: true,
+    message: 'Nama harus diisi',
+  },
+  penyakit: {
+    required: true,
+    message: 'Prediksi penyakit harus diisi',
+  },
+  file: {
+    required: true,
+    message: 'File DNA harus dipilih',
+  },
+};
+
+const formRef = ref(null);
+const router = useRouter();
+
+const handleClick = () => {
+  formRef.value?.validate()
+    .then(() => router.push({ name: 'result' }))
+    .catch(() => {});
+};
+
+const listPenyakit = reactive([]);
+onMounted(() => {
+  // API call...
+  for (let i = 1; i <= 50; i++) {
+    listPenyakit.push({
+      label: `Penyakit ${i}`,
+      value: `penyakit${i}`,
+    });
+  }
+});
+
 </script>
 
 <template>
@@ -16,21 +60,41 @@ import SearchIcon from '@/assets/icons/Search.svg';
       }"
       class="search-form-box"
     >
-      <NForm>
-        <NFormItem label="Nama Pasien">
+      <NForm
+        ref="formRef"
+        :model="input"
+        :rules="rules"
+      >
+        <NFormItem
+          label="Nama"
+          path="nama"
+        >
           <NInput
-            placeholder="Masukkan nama pasien"
+            v-model:value="input.nama"
+            placeholder="Masukkan nama kamu"
             size="large"
           />
         </NFormItem>
-        <NFormItem label="Prediksi Penyakit">
-          <NInput
+        <NFormItem
+          label="Prediksi Penyakit"
+          path="penyakit"
+        >
+          <NSelect
+            v-model:value="input.penyakit"
             placeholder="Masukkan nama penyakit yang diprediksi"
             size="large"
+            filterable=""
+            :options="listPenyakit"
+            :input-props="{
+              autocomplete: 'disabled'
+            }"
           />
         </NFormItem>
-        <NFormItem label="File Sequence DNA">
-          <InlineFileInput />
+        <NFormItem
+          label="File Sequence DNA"
+          path="file"
+        >
+          <InlineFileInput v-model:value="input.file" />
         </NFormItem>
       </NForm>
       <template #action>
@@ -38,6 +102,7 @@ import SearchIcon from '@/assets/icons/Search.svg';
           <NButton
             type="info"
             size="large"
+            @click="handleClick"
           >
             <template #icon>
               <NIcon>

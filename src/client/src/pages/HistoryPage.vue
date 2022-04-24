@@ -1,9 +1,12 @@
 <script setup>
 import {
+  h, onMounted, reactive, ref,
+} from 'vue';
+import {
   NDataTable, NInputGroup, NInput, NButton, NIcon, NTag,
 } from 'naive-ui';
+
 import SearchIcon from '@/assets/icons/Search.svg';
-import { h } from 'vue';
 
 const columns = [
   {
@@ -31,22 +34,37 @@ const columns = [
           type: row.result ? 'success' : 'error',
           size: 'large',
         },
-        { default: () => (row.result ? 'True' : 'False') },
+        { default: () => (row.result ? 'Positif' : 'Negatif') },
       );
     },
   },
 ];
 
-const data = [];
+const filter = ref(null);
+const data = reactive([]);
+const isLoading = ref(false);
 
-for (let i = 1; i <= 100; i++) {
-  data.push({
-    nama: `Nama ${i}`,
-    waktu: new Date(),
-    prediksi: `Prediksi ${i}`,
-    result: i % 2 === 0,
-  });
-}
+const fetchData = () => {
+  // API call based on filter value...
+  isLoading.value = true;
+  setTimeout(() => {
+    for (let i = 1; i <= 100; i++) {
+      data.push({
+        nama: `Nama ${i}`,
+        waktu: new Date(),
+        prediksi: `Prediksi ${i}`,
+        result: i % 2 === 0,
+      });
+    }
+    isLoading.value = false;
+  }, 2000);
+};
+
+onMounted(() => {
+  fetchData();
+});
+
+const handleClick = () => fetchData();
 </script>
 
 <template>
@@ -54,7 +72,11 @@ for (let i = 1; i <= 100; i++) {
     <h1>Riwayat Cek DNA</h1>
     <div class="history-search">
       <NInputGroup>
-        <NInput placeholder="Masukkan pencarian..." />
+        <NInput
+          v-model:value="filter"
+          placeholder="Masukkan pencarian..."
+          @click="handleClick"
+        />
         <NButton
           type="primary"
           size="large"
@@ -69,6 +91,7 @@ for (let i = 1; i <= 100; i++) {
     </div>
     <div class="table">
       <NDataTable
+        :loading="isLoading"
         :columns="columns"
         :data="data"
         :pagination="{ pageSize: 10 }"

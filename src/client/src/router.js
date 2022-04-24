@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import LandingPage from '@/pages/LandingPage.vue';
 import SearchPage from '@/pages/SearchPage.vue';
+import SearchResultPage from '@/pages/SearchResultPage.vue';
 import InsertPage from '@/pages/InsertPage.vue';
+import InsertResultPage from '@/pages/InsertResultPage.vue';
 import HistoryPage from '@/pages/HistoryPage.vue';
 
 export const routes = [
@@ -20,13 +22,23 @@ export const routes = [
     },
   },
   {
+    path: '/search/result',
+    name: 'result',
+    component: SearchResultPage,
+  },
+  {
     path: '/new',
     name: 'new',
     component: InsertPage,
     meta: {
-      label: 'Masukkan Baru',
+      label: 'Tambah Data',
       showNavlink: () => true,
     },
+  },
+  {
+    path: '/new/post',
+    name: 'post',
+    component: InsertResultPage,
   },
   {
     path: '/history',

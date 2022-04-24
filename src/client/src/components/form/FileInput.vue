@@ -1,91 +1,77 @@
 <script setup>
 import {
-  NUpload, NUploadTrigger, NText, NIcon, NButton, NCard,
+  NUpload, NUploadDragger, NText, NIcon, NButton,
 } from 'naive-ui';
-import { reactive } from 'vue';
+import { ref, computed } from 'vue';
+
 import AttachIcon from '@/assets/icons/Upload.svg';
 
-const trigger = reactive({
-  isDragging: false,
-});
-
-const handleDragEnter = (e, uploadHandler) => {
-  trigger.isDragging = true;
-  uploadHandler(e);
-};
-
-const handleDragLeave = (e, uploadHandler) => {
-  trigger.isDragging = false;
-  uploadHandler(e);
-};
-
 const emit = defineEmits(['change']);
+
+const fileList = ref([]);
+
+const el = ref(null);
+const isDragging = computed(() => el.value?.dragOver);
 
 </script>
 
 <template>
   <NUpload
-    action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
-    abstract
-    :max="1"
+    ref="el"
+    :file-list="fileList"
     :show-file-list="false"
-    @change="emit('change', $event)"
+    class="dragger-file-input"
+    @change="emit('change', $event.file)"
+    @update:file-list="fileList = []"
   >
-    <NUploadTrigger
-      #="nHandler"
-      abstract
+    <NUploadDragger
+      :class="{ 'dragger': true, 'dragging': isDragging }"
     >
-      <NCard
-        :class="{ 'trigger': true, 'dragging': trigger.isDragging }"
-        size="medium"
-        :theme-overrides="{ paddingMedium: '0'}"
-        @click="nHandler.handleClick"
-        @dragover="handleDragEnter($event, nHandler.handleDragOver)"
-        @dragenter="handleDragEnter($event, nHandler.handleDragEnter)"
-        @dragleave="handleDragLeave($event, nHandler.handleDragLeave)"
-        @drop="handleDragLeave($event, nHandler.handleDrop)"
-      >
-        <div class="trigger-content">
-          <div>
-            <NIcon
-              size="48"
-              :depth="3"
-            >
-              <AttachIcon />
-            </NIcon>
-          </div>
-          <div
-            class="button-wrapper"
-            style="margin-top: 10px;"
-          >
-            <NButton
-              strong
-              type="primary"
-              size="large"
-            >
-              Unggah File DNA
-            </NButton>
-          </div>
-          <NText style="font-size: 1.25rem; margin-top: 10px;">
-            atau geser file kamu ke area ini.
-          </NText>
-          <NText
+      <div class="dragger-content">
+        <div>
+          <NIcon
+            size="48"
             :depth="3"
-            style="margin-top: 20px;"
           >
-            <div>Pastikan file kamu adalah file teks yang berisi rangkaian DNA</div>
-            <div>yang terdiri dari huruf A, G, T, dan C dalam huruf kapital.</div>
-          </NText>
+            <AttachIcon />
+          </NIcon>
         </div>
-      </NCard>
-    </NUploadTrigger>
+        <div
+          class="button-wrapper"
+          style="margin-top: 10px;"
+        >
+          <NButton
+            strong
+            type="primary"
+            size="large"
+          >
+            Unggah File DNA
+          </NButton>
+        </div>
+        <NText style="font-size: 1.25rem; margin-top: 10px;">
+          atau geser file kamu ke area ini.
+        </NText>
+        <NText
+          :depth="3"
+          style="margin-top: 20px;"
+        >
+          <div>Pastikan file kamu adalah file teks yang berisi rangkaian DNA</div>
+          <div>yang terdiri dari huruf A, G, T, dan C dalam huruf kapital.</div>
+        </NText>
+      </div>
+    </NUploadDragger>
   </NUpload>
 </template>
 
 <style lang="scss" scoped>
 @use "@/assets/styles/colors";
+.dragger-file-input {
+  display: flex;
+  flex-direction: column;
+}
 
-.trigger {
+.dragger {
+  width: 100%;
   background-color: colors.$grey-light;
   border-radius: 10px;
   border: 2px dashed colors.$grey-light-outline;
@@ -94,11 +80,11 @@ const emit = defineEmits(['change']);
 
   &.dragging {
     background-color: colors.$green-light;
-    border-color: colors.$green-light-outline;
+    border: 2px dashed colors.$green-light-outline;
   }
 }
 
-.trigger-content {
+.dragger-content {
   display: flex;
   flex-direction: column;
   justify-content: center;

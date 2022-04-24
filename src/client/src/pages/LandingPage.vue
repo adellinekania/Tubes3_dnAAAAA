@@ -1,5 +1,15 @@
 <script setup>
-import FileInput from '../components/form/FileInput.vue';
+import { useRouter } from 'vue-router';
+
+import FileInput from '@/components/form/FileInput.vue';
+import { useStore as useSearchStore } from '@/stores/search';
+
+const router = useRouter();
+const searchStore = useSearchStore();
+const handleFileInput = async (file) => {
+  searchStore.data.file = file;
+  router.push({ name: 'search' });
+};
 </script>
 
 <template>
@@ -10,7 +20,7 @@ import FileInput from '../components/form/FileInput.vue';
       <div>Cari nama penyakit dari sequence DNA yang kamu punya!</div>
     </div>
     <div class="input">
-      <FileInput />
+      <FileInput @change="handleFileInput" />
     </div>
   </div>
 </template>
