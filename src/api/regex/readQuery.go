@@ -1,48 +1,58 @@
 package regex
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
+func splitWord(word string) []string {
+	array := regexp.MustCompile("[\\-\\/\\.\\s]+").Split(word, -1)
+	return array
+}
+
 func ReadQuery(query string) (bool, string, string, string) {
-	arrQuery := strings.Split(query, "-")
+	months := [...]string{
+		"January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December",
+	}
+	valid := false
+	validQueryRegex := [...]string{
+		"\\d{2}-\\d{2}-\\d{4}.*",
+		"\\d{2}/\\d{2}/\\d{4}.*",
+		"\\d{2} \\d{2} \\d{4}.*",
+		"\\d{2} (January|February|March|April|May|June|July|August|September|October|November|December) \\d{4}.*",
+	}
+	i := 0
 
-	_, isNotDate := strconv.Atoi(arrQuery[0])
+	_, isNotDate := strconv.Atoi(string(query[0]))
 
-	date := ""
-	penyakit := ""
+	if isNotDate != nil {
+		return true, "Query Benar", "", query
+	}
 
-	// Kalo tanggal (angka depannya)
-	if isNotDate == nil {
-		if len(arrQuery) < 3 {
-			return false, "Format tanggal salah", date, penyakit
+	for i < len(validQueryRegex) && !valid {
+		match, _ := regexp.MatchString(validQueryRegex[i], query)
+		if match {
+			valid = true
+		} else {
+			i++
 		}
-		if _, isNotMonth := strconv.Atoi(arrQuery[1]); isNotMonth == nil {
-			return false, "Format bulan salah, tidak boleh angka", date, penyakit
-		}
-		if !(arrQuery[1] == "January" || arrQuery[1] == "February" || arrQuery[1] == "March" || arrQuery[1] == "April" || arrQuery[1] == "May" || arrQuery[1] == "June" || arrQuery[1] == "July" || arrQuery[1] == "August" || arrQuery[1] == "September" || arrQuery[1] == "October" || arrQuery[1] == "November" || arrQuery[1] == "December") {
-			return false, "Format bulan salah, bulan tidak valid", date, penyakit
-		}
-		if _, isNotYear := strconv.Atoi(arrQuery[2]); isNotYear != nil {
-			return false, "Format tahun salah, harus angka", date, penyakit
-		}
+	}
 
-		date += arrQuery[0] + " " + arrQuery[1] + " " + arrQuery[2]
-
-		if len(arrQuery) > 3 {
-			for i := 3; i < len(arrQuery)-1; i++ {
-				penyakit += arrQuery[i] + " "
-			}
-			penyakit += arrQuery[len(arrQuery)-1]
+	arrQuery := splitWord(query)
+	if valid {
+		m, _ := strconv.Atoi(arrQuery[1])
+		if i != 3 {
+			arrQuery[1] = months[m-1]
 		}
-
-		return true, "Data Benar", date, penyakit
+		newDate := arrQuery[1] + " " + arrQuery[0] + ", " + arrQuery[2]
+		_, err := time.Parse("January 02, 2006", newDate)
+		if err != nil {
+			return false, "Format penanggalan salah!", "", ""
+		}
+		return true, "Query Benar", newDate, strings.Join(arrQuery[3:], " ")
 	} else {
-		for i := 0; i < len(arrQuery)-1; i++ {
-			penyakit += arrQuery[i] + " "
-		}
-		penyakit += arrQuery[len(arrQuery)-1]
-		return true, "Query Benar", date, penyakit
+		return false, "Format query salah!", "", ""
 	}
 }

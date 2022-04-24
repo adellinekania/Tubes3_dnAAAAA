@@ -1,7 +1,6 @@
 package stringmatching
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -20,7 +19,6 @@ func BuildLast(inputPattern string) []int {
 }
 
 func BmStringMatching(inputPattern string, inputText string) (bool, int, int) {
-	fmt.Println("BM")
 	last := BuildLast(inputPattern)
 	n := len(inputText)
 	m := len(inputPattern)

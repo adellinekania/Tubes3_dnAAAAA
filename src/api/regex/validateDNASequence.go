@@ -3,6 +3,7 @@ package regex
 import (
 	"bufio"
 	"mime/multipart"
+	"regexp"
 )
 
 func ValidateDNASequence(f multipart.File) (bool, string) {
@@ -13,13 +14,9 @@ func ValidateDNASequence(f multipart.File) (bool, string) {
 		// do something with a line
 		dnaSequence += scanner.Text()
 	}
-
-	for i := 0; i < len(dnaSequence); i++ {
-		dna := string(dnaSequence[i])
-		// fmt.Println(dna)
-		if !(dna == "C" || dna == "G" || dna == "A" || dna == "T") {
-			return false, ""
-		}
+	match, _ := regexp.MatchString("^[CAGT]+$", dnaSequence)
+	if !match {
+		return false, ""
 	}
 
 	return true, dnaSequence
