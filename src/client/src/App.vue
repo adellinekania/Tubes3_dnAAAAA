@@ -28,8 +28,8 @@ const isHome = computed(() => useRoute().name === 'home');
     <NGlobalStyle />
     <NavigationBar :minimal="isHome" />
     <main>
-      <router-view #="{ Component, route }">
-        <transition
+      <RouterView #="{ Component, route }">
+        <Transition
           name="fade"
           mode="out-in"
         >
@@ -37,8 +37,8 @@ const isHome = computed(() => useRoute().name === 'home');
             :is="Component"
             :key="route.path"
           />
-        </transition>
-      </router-view>
+        </Transition>
+      </RouterView>
     </main>
   </NConfigProvider>
 </template>

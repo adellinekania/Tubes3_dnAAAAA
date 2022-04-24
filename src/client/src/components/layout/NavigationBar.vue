@@ -29,7 +29,7 @@ const options = computed(() => routes
 <template>
   <header :class="props.minimal ? 'header-min' : 'header'">
     <div class="header-wrapper">
-      <router-link
+      <RouterLink
         custom
         :to="{ name: 'home' }"
         #="{ href, navigate }"
@@ -41,7 +41,7 @@ const options = computed(() => routes
         >
           <h1>🧬dnAAAAA</h1>
         </div>
-      </router-link>
+      </RouterLink>
       <div class="navlinks">
         <NMenu
           mode="horizontal"

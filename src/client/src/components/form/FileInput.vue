@@ -24,18 +24,18 @@ const emit = defineEmits(['change']);
 </script>
 
 <template>
-  <n-upload
+  <NUpload
     action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
     abstract
     :max="1"
     :show-file-list="false"
     @change="emit('change', $event)"
   >
-    <n-upload-trigger
+    <NUploadTrigger
       #="nHandler"
       abstract
     >
-      <n-card
+      <NCard
         :class="{ 'trigger': true, 'dragging': trigger.isDragging }"
         size="medium"
         :theme-overrides="{ paddingMedium: '0'}"
@@ -47,39 +47,39 @@ const emit = defineEmits(['change']);
       >
         <div class="trigger-content">
           <div>
-            <n-icon
+            <NIcon
               size="48"
               :depth="3"
             >
-              <attach-icon />
-            </n-icon>
+              <AttachIcon />
+            </NIcon>
           </div>
           <div
             class="button-wrapper"
             style="margin-top: 10px;"
           >
-            <n-button
+            <NButton
               strong
               type="primary"
               size="large"
             >
               Unggah File DNA
-            </n-button>
+            </NButton>
           </div>
-          <n-text style="font-size: 1.25rem; margin-top: 10px;">
+          <NText style="font-size: 1.25rem; margin-top: 10px;">
             atau geser file kamu ke area ini.
-          </n-text>
-          <n-text
+          </NText>
+          <NText
             :depth="3"
             style="margin-top: 20px;"
           >
             <div>Pastikan file kamu adalah file teks yang berisi rangkaian DNA</div>
             <div>yang terdiri dari huruf A, G, T, dan C dalam huruf kapital.</div>
-          </n-text>
+          </NText>
         </div>
-      </n-card>
-    </n-upload-trigger>
-  </n-upload>
+      </NCard>
+    </NUploadTrigger>
+  </NUpload>
 </template>
 
 <style lang="scss" scoped>

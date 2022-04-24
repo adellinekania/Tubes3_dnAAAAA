@@ -8,7 +8,7 @@ import SearchIcon from '@/assets/icons/Add.svg';
 
 <template>
   <div class="page-container insert">
-    <n-card
+    <NCard
       title="Tambahkan DNA Penyakit Baru"
       :segmented="{
         content: true,
@@ -16,33 +16,33 @@ import SearchIcon from '@/assets/icons/Add.svg';
       }"
       class="insert-form-box"
     >
-      <n-form>
-        <n-form-item label="Nama Penyakit">
-          <n-input
+      <NForm>
+        <NFormItem label="Nama Penyakit">
+          <NInput
             placeholder="Masukkan nama penyakit"
             size="large"
           />
-        </n-form-item>
-        <n-form-item label="File Sequence DNA">
-          <inline-file-input />
-        </n-form-item>
-      </n-form>
+        </NFormItem>
+        <NFormItem label="File Sequence DNA">
+          <InlineFileInput />
+        </NFormItem>
+      </NForm>
       <template #action>
         <div class="action">
-          <n-button
+          <NButton
             type="info"
             size="large"
           >
             <template #icon>
-              <n-icon>
-                <search-icon />
-              </n-icon>
+              <NIcon>
+                <SearchIcon />
+              </NIcon>
             </template>
             Tambahkan
-          </n-button>
+          </NButton>
         </div>
       </template>
-    </n-card>
+    </NCard>
   </div>
 </template>
 

@@ -7,36 +7,36 @@ const emit = defineEmits(['change']);
 </script>
 
 <template>
-  <n-upload
+  <NUpload
     abstract
     :show-file-list="false"
     :max="1"
     @change="emit('change', $event)"
   >
-    <n-upload-trigger
+    <NUploadTrigger
       #="{ handleClick }"
       abstract
     >
-      <n-input-group>
-        <n-input-group-label
+      <NInputGroup>
+        <NInputGroupLabel
           size="large"
           style="width: 100%;"
         >
-          <n-text
+          <NText
             :depth="3"
             italic
           >
             Pilih file...
-          </n-text>
-        </n-input-group-label>
-        <n-button
+          </NText>
+        </NInputGroupLabel>
+        <NButton
           type="primary"
           size="large"
           @click="handleClick"
         >
           Pilih File
-        </n-button>
-      </n-input-group>
-    </n-upload-trigger>
-  </n-upload>
+        </NButton>
+      </NInputGroup>
+    </NUploadTrigger>
+  </NUpload>
 </template>

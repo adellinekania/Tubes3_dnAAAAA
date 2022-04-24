@@ -53,22 +53,22 @@ for (let i = 1; i <= 100; i++) {
   <div class="page-container history">
     <h1>Riwayat Cek DNA</h1>
     <div class="history-search">
-      <n-input-group>
-        <n-input placeholder="Masukkan pencarian..." />
-        <n-button
+      <NInputGroup>
+        <NInput placeholder="Masukkan pencarian..." />
+        <NButton
           type="primary"
           size="large"
         >
           <template #icon>
-            <n-icon>
-              <search-icon />
-            </n-icon>
+            <NIcon>
+              <SearchIcon />
+            </NIcon>
           </template>
-        </n-button>
-      </n-input-group>
+        </NButton>
+      </NInputGroup>
     </div>
     <div class="table">
-      <n-data-table
+      <NDataTable
         :columns="columns"
         :data="data"
         :pagination="{ pageSize: 10 }"

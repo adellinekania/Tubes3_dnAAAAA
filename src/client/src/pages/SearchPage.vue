@@ -8,7 +8,7 @@ import SearchIcon from '@/assets/icons/Search.svg';
 
 <template>
   <div class="page-container search">
-    <n-card
+    <NCard
       title="Tes DNA"
       :segmented="{
         content: true,
@@ -16,39 +16,39 @@ import SearchIcon from '@/assets/icons/Search.svg';
       }"
       class="search-form-box"
     >
-      <n-form>
-        <n-form-item label="Nama Pasien">
-          <n-input
+      <NForm>
+        <NFormItem label="Nama Pasien">
+          <NInput
             placeholder="Masukkan nama pasien"
             size="large"
           />
-        </n-form-item>
-        <n-form-item label="Prediksi Penyakit">
-          <n-input
+        </NFormItem>
+        <NFormItem label="Prediksi Penyakit">
+          <NInput
             placeholder="Masukkan nama penyakit yang diprediksi"
             size="large"
           />
-        </n-form-item>
-        <n-form-item label="File Sequence DNA">
-          <inline-file-input />
-        </n-form-item>
-      </n-form>
+        </NFormItem>
+        <NFormItem label="File Sequence DNA">
+          <InlineFileInput />
+        </NFormItem>
+      </NForm>
       <template #action>
         <div class="action">
-          <n-button
+          <NButton
             type="info"
             size="large"
           >
             <template #icon>
-              <n-icon>
-                <search-icon />
-              </n-icon>
+              <NIcon>
+                <SearchIcon />
+              </NIcon>
             </template>
             Cocokkan DNA
-          </n-button>
+          </NButton>
         </div>
       </template>
-    </n-card>
+    </NCard>
   </div>
 </template>
 
