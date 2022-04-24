@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   env: {
     browser: true,
@@ -7,7 +9,6 @@ module.exports = {
   extends: [
     'plugin:vue/vue3-recommended',
     'airbnb-base',
-    'prettier',
   ],
   parserOptions: {
     ecmaVersion: 2022,
@@ -15,16 +16,19 @@ module.exports = {
   },
   plugins: [
     'vue',
+    'import',
   ],
   rules: {
     'vue/script-setup-uses-vars': 'error',
-    'vue/max-attributes-per-line': ['error', {
-      singleline: {
-        max: 3,
+    'no-plusplus': ['error', { allowForLoopAfterthoughts: true }],
+  },
+  settings: {
+    'import/resolver': {
+      alias: {
+        map: [
+          ['@', path.resolve(__dirname, 'src')],
+        ],
       },
-      multiline: {
-        max: 1,
-      },
-    }],
+    },
   },
 };
