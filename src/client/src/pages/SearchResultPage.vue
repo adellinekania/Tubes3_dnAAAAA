@@ -41,6 +41,7 @@ onMounted(async () => {
     result.isLoading = false;
     result.nama = testResult.data.Data.Nama_pengguna;
     result.penyakit = testResult.data.Data.Prediksi_penyakit;
+    result.kemiripan = (testResult.data.Data.Persentase_kemiripan * 100).toFixed(2);
     result.date = new Date();
     result.isMatch = testResult.data.Data.Hasil_tes;
     result.isError = false;
@@ -48,6 +49,7 @@ onMounted(async () => {
     result.isLoading = false;
     result.nama = store.data.nama;
     result.penyakit = store.data.penyakit;
+    result.kemiripan = 0;
     result.date = new Date();
     result.isError = true;
   }
@@ -118,6 +120,10 @@ const props = computed(() => {
               <tr>
                 <td>Penyakit</td>
                 <td>: {{ result.penyakit }}</td>
+              </tr>
+              <tr>
+                <td>Kemiripan</td>
+                <td>: {{ result.kemiripan }}%</td>
               </tr>
               </tbody>
             </table>
