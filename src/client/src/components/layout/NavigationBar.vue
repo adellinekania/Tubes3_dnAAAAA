@@ -1,8 +1,13 @@
 <script setup>
-import { h, computed } from 'vue';
-import { RouterLink, useRoute } from 'vue-router';
-import { NMenu } from 'naive-ui';
-import { routes } from '@/router';
+import {
+  h, ref, watch, reactive, onMounted,
+} from 'vue';
+import { RouterLink, useRoute, useRouter } from 'vue-router';
+import {
+  NMenu, NButton, NIcon, NDrawer,
+} from 'naive-ui';
+
+import MenuIcon from '@/assets/icons/Menu.svg';
 
 const props = defineProps({
   minimal: {
@@ -11,18 +16,38 @@ const props = defineProps({
   },
 });
 
+const router = useRouter();
 const route = useRoute();
 
-const options = computed(() => routes
-  .filter((r) => r.meta?.showNavlink(route))
-  .map((r) => ({
-    key: r.name,
-    label: () => h(
-      RouterLink,
-      { to: { name: r.name } },
-      { default: () => r.meta.label },
-    ),
-  })));
+const options = reactive([]);
+const computeOptions = () => {
+  options.splice(0, options.length);
+  router.getRoutes()
+    .filter((r) => r.meta.showNavlink && r.meta.showNavlink(route))
+    .forEach((r) => {
+      options.push({
+        key: r.name,
+        label: () => h(
+          RouterLink,
+          { to: { name: r.name } },
+          { default: () => r.meta.label },
+        ),
+      });
+    });
+};
+
+onMounted(computeOptions);
+
+const isDrawerOpen = ref(false);
+
+watch(() => route.name, () => {
+  if (isDrawerOpen.value) {
+    isDrawerOpen.value = false;
+    setTimeout(computeOptions, 300);
+  } else {
+    computeOptions();
+  }
+});
 
 </script>
 
@@ -42,18 +67,48 @@ const options = computed(() => routes
           <h1>🧬dnAAAAA</h1>
         </div>
       </RouterLink>
-      <div class="navlinks">
+      <div class="navlinks horizontal">
         <NMenu
           mode="horizontal"
           :options="options"
           :value="route.name"
         />
       </div>
+      <div class="navlinks control">
+        <NButton
+          quaternary
+          type="primary"
+          size="medium"
+          :theme-overrides="{
+            heightMedium: '34px',
+            paddingMedium: '0 10px',
+            iconSizeMedium: '24px',
+          }"
+          @click="isDrawerOpen = true"
+        >
+          <template #icon>
+            <NIcon>
+              <MenuIcon />
+            </NIcon>
+          </template>
+        </NButton>
+      </div>
+      <NDrawer
+        v-model:show="isDrawerOpen"
+        placement="top"
+        height="max-content"
+      >
+        <NMenu
+          :options="options"
+          :value="route.name"
+        />
+      </NDrawer>
     </div>
   </header>
 </template>
 
 <style lang="scss" scoped>
+@use "sass-mq";
 @use "@/assets/styles/layout";
 @use "@/assets/styles/fonts";
 
@@ -66,19 +121,20 @@ header {
   width: 100%;
   display: flex;
   justify-content: center;
-
-  .header-wrapper {
-    width: 100%;
-    max-width: layout.$content-max-width;
-    padding: .5rem 1.5rem;
-    display: flex;
-    align-items: center;
-  }
 }
 
 h1 {
   margin: 0;
   font-family: fonts.$brand;
+}
+
+.header-wrapper {
+  width: 100%;
+  max-width: layout.$content-max-width;
+  margin: .5rem 1.5rem;
+  display: flex;
+  align-items: center;
+  position: relative;
 }
 
 .brand {
@@ -89,8 +145,23 @@ h1 {
 }
 
 .navlinks {
-  flex-grow: 1;
   display: flex;
   justify-content: end;
+  position: absolute;
+  right: 0;
+}
+
+.horizontal {
+  opacity: 0;
+}
+
+@include sass-mq.mq($from: tablet) {
+  .horizontal {
+    opacity: 1;
+  }
+
+  .control {
+    opacity: 0;
+  }
 }
 </style>

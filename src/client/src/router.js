@@ -1,21 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import LandingPage from '@/pages/LandingPage.vue';
-import SearchPage from '@/pages/SearchPage.vue';
-import SearchResultPage from '@/pages/SearchResultPage.vue';
-import InsertPage from '@/pages/InsertPage.vue';
-import InsertResultPage from '@/pages/InsertResultPage.vue';
-import HistoryPage from '@/pages/HistoryPage.vue';
 
 export const routes = [
   {
     path: '/',
     name: 'home',
-    component: LandingPage,
+    component: () => import('@/pages/LandingPage.vue'),
   },
   {
     path: '/search',
     name: 'search',
-    component: SearchPage,
+    component: () => import('@/pages/SearchPage.vue'),
     meta: {
       label: 'Tes DNA',
       showNavlink: (route) => route.name !== 'home',
@@ -24,12 +18,12 @@ export const routes = [
   {
     path: '/search/result',
     name: 'result',
-    component: SearchResultPage,
+    component: () => import('@/pages/SearchResultPage.vue'),
   },
   {
     path: '/new',
     name: 'new',
-    component: InsertPage,
+    component: () => import('@/pages/InsertPage.vue'),
     meta: {
       label: 'Tambah Data',
       showNavlink: () => true,
@@ -38,12 +32,12 @@ export const routes = [
   {
     path: '/new/post',
     name: 'post',
-    component: InsertResultPage,
+    component: () => import('@/pages/InsertResultPage.vue'),
   },
   {
     path: '/history',
     name: 'history',
-    component: HistoryPage,
+    component: () => import('@/pages/HistoryPage.vue'),
     meta: {
       label: 'Riwayat',
       showNavlink: () => true,
