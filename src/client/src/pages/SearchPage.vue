@@ -1,13 +1,13 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import {onMounted, reactive, ref} from 'vue';
+import {useRouter} from 'vue-router';
 import {
   NCard, NForm, NFormItem, NInput, NSelect, NButton, NIcon,
 } from 'naive-ui';
 
 import InlineFileInput from '@/components/form/InlineFileInput.vue';
 import SearchIcon from '@/assets/icons/Search.svg';
-import { useStore as useSearchStore } from '@/stores/search';
+import {useStore as useSearchStore} from '@/stores/search';
 import axios from "axios";
 
 const searchStore = useSearchStore();
@@ -23,6 +23,10 @@ const rules = {
     required: true,
     message: 'Prediksi penyakit harus diisi',
   },
+  metode: {
+    required: true,
+    message: 'Metode harus diisi',
+  },
   file: {
     required: true,
     message: 'File DNA harus dipilih',
@@ -34,19 +38,35 @@ const router = useRouter();
 
 const handleClick = () => {
   formRef.value?.validate()
-    .then(() => router.push({ name: 'result' }))
-    .catch(() => {});
+      .then(() => router.push({name: 'result'}))
+      .catch(() => {
+      });
 };
 
 const listPenyakit = reactive([]);
+const listMetode = reactive([]);
+const metodeMap = {
+  "KMP": "Knuth–Morris–Pratt",
+  "BM": "Boyer Moore"
+}
+
 onMounted(async () => {
-  const penyakit = await axios.get('/api/penyakit')
-  penyakit.data.Data.forEach(d => {
-    listPenyakit.push({
-      label: d.nama_penyakit,
-      value: d.nama_penyakit
+  for (let key in metodeMap) {
+    listMetode.push({
+      label: metodeMap[key],
+      value: key
     })
-  })
+  }
+
+  const penyakit = await axios.get('/api/penyakit')
+  if (penyakit.data.Data) {
+    penyakit.data.Data.forEach(d => {
+      listPenyakit.push({
+        label: d.nama_penyakit,
+        value: d.nama_penyakit
+      })
+    })
+  }
 });
 
 </script>
@@ -54,60 +74,75 @@ onMounted(async () => {
 <template>
   <div class="page-container search">
     <NCard
-      title="Tes DNA"
-      :segmented="{
+        title="Tes DNA"
+        :segmented="{
         content: true,
         footer: 'soft'
       }"
-      class="search-form-box"
+        class="search-form-box"
     >
       <NForm
-        ref="formRef"
-        :model="input"
-        :rules="rules"
+          ref="formRef"
+          :model="input"
+          :rules="rules"
       >
         <NFormItem
-          label="Nama"
-          path="nama"
+            label="Nama"
+            path="nama"
         >
           <NInput
-            v-model:value="input.nama"
-            placeholder="Masukkan nama kamu"
-            size="large"
+              v-model:value="input.nama"
+              placeholder="Masukkan nama kamu"
+              size="large"
           />
         </NFormItem>
         <NFormItem
-          label="Prediksi Penyakit"
-          path="penyakit"
+            label="Prediksi Penyakit"
+            path="penyakit"
         >
           <NSelect
-            v-model:value="input.penyakit"
-            placeholder="Masukkan nama penyakit yang diprediksi"
-            size="large"
-            filterable=""
-            :options="listPenyakit"
-            :input-props="{
+              v-model:value="input.penyakit"
+              placeholder="Masukkan nama penyakit yang diprediksi"
+              size="large"
+              filterable=""
+              :options="listPenyakit"
+              :input-props="{
               autocomplete: 'disabled'
             }"
           />
         </NFormItem>
         <NFormItem
-          label="File Sequence DNA"
-          path="file"
+            label="Metode Pencocokan String"
+            path="metode"
         >
-          <InlineFileInput v-model:value="input.file" />
+          <NSelect
+              v-model:value="input.metode"
+              placeholder="Pilih metode pencocokan string"
+              size="large"
+              filterable=""
+              :options="listMetode"
+              :input-props="{
+              autocomplete: 'disabled'
+            }"
+          />
+        </NFormItem>
+        <NFormItem
+            label="File Sequence DNA"
+            path="file"
+        >
+          <InlineFileInput v-model:value="input.file"/>
         </NFormItem>
       </NForm>
       <template #action>
         <div class="action">
           <NButton
-            type="info"
-            size="large"
-            @click="handleClick"
+              type="info"
+              size="large"
+              @click="handleClick"
           >
             <template #icon>
               <NIcon>
-                <SearchIcon />
+                <SearchIcon/>
               </NIcon>
             </template>
             Cocokkan DNA

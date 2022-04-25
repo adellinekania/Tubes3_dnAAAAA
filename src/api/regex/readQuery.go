@@ -18,8 +18,7 @@ func ReadQuery(query string) (bool, string, string, string) {
 	}
 	valid := false
 	validQueryRegex := [...]string{
-		"\\d{2}-\\d{2}-\\d{4}.*",
-		"\\d{2}/\\d{2}/\\d{4}.*",
+		"\\d{2}[/.-]\\d{2}[/.-]\\d{4}.*",
 		"\\d{2} \\d{2} \\d{4}.*",
 		"\\d{2} (January|February|March|April|May|June|July|August|September|October|November|December) \\d{4}.*",
 	}
@@ -43,13 +42,13 @@ func ReadQuery(query string) (bool, string, string, string) {
 	arrQuery := splitWord(query)
 	if valid {
 		m, _ := strconv.Atoi(arrQuery[1])
-		if i != 3 {
+		if i != 2 {
 			arrQuery[1] = months[m-1]
 		}
 		newDate := arrQuery[1] + " " + arrQuery[0] + ", " + arrQuery[2]
 		_, err := time.Parse("January 02, 2006", newDate)
 		if err != nil {
-			return false, "Format penanggalan salah!", "", ""
+			return false, "Tanggal salah!", "", ""
 		}
 		return true, "Query Benar", newDate, strings.Join(arrQuery[3:], " ")
 	} else {

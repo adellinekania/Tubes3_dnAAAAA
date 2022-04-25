@@ -1,9 +1,5 @@
 package stringmatching
 
-import (
-	"fmt"
-)
-
 func BorderFunction(inputPattern string) []int {
 	inputPatternLength := int(len(inputPattern))
 	b := make([]int, inputPatternLength)
@@ -63,6 +59,5 @@ func StringMatching(inputPattern string, inputText string) (bool, int, int) {
 		count++
 	}
 
-	fmt.Println(isMatch, startingIndex, "Jumlah perbandungan", jumlahPerbandingan)
 	return isMatch, startingIndex, jumlahPerbandingan
 }

@@ -27,38 +27,42 @@ const columns = [
     key: 'result',
     render(row) {
       return h(
-        NTag,
-        {
-          type: row.result ? 'success' : 'error',
-          size: 'large',
-        },
-        { default: () => (row.result ? 'Positif' : 'Negatif') },
+          NTag,
+          {
+            type: row.result ? 'success' : 'error',
+            size: 'large',
+          },
+          {default: () => (row.result ? 'Positif' : 'Negatif')},
       );
     },
   },
 ];
 
 const filter = ref(null);
-let data = reactive([]);
+const data = reactive([]);
 const isLoading = ref(false);
 
 const fetchData = () => {
   isLoading.value = true;
   let url = "/api/tesDNA"
-  if (filter.value !== null) {
+  if (filter.value !== null && filter.value !== "") {
     url += `/${filter.value}`
   }
-  console.log(url)
+  data.length = 0;
   axios.get(url).then(res => {
-    res.data.Data.forEach(d => {
-      data.push({
-        nama: d.nama_pengguna,
-        waktu: d.tanggal,
-        prediksi: d.prediksi_penyakit,
-        result: d.hasil_tes,
-      });
-    })
-    console.log(data);
+    if (res.data.Data) {
+      res.data.Data.forEach(d => {
+        data.push({
+          nama: d.nama_pengguna,
+          waktu: d.tanggal,
+          prediksi: d.prediksi_penyakit,
+          result: d.hasil_tes,
+        });
+      })
+    }
+    isLoading.value = false;
+  }).catch(err => {
+    alert(err.response.data.Message)
     isLoading.value = false;
   })
 };
@@ -76,17 +80,17 @@ const handleClick = () => fetchData();
     <div class="history-search">
       <NInputGroup>
         <NInput
-          v-model:value="filter"
-          placeholder="Masukkan pencarian..."
-          @click="handleClick"
+            v-model:value="filter"
+            placeholder="Masukkan pencarian..."
+            @click="handleClick"
         />
         <NButton
-          type="primary"
-          size="large"
+            type="primary"
+            size="large"
         >
           <template #icon>
             <NIcon>
-              <SearchIcon />
+              <SearchIcon/>
             </NIcon>
           </template>
         </NButton>
@@ -94,10 +98,10 @@ const handleClick = () => fetchData();
     </div>
     <div class="table">
       <NDataTable
-        :loading="isLoading"
-        :columns="columns"
-        :data="data"
-        :pagination="{ pageSize: 10 }"
+          :loading="isLoading"
+          :columns="columns"
+          :data="data"
+          :pagination="{ pageSize: 10 }"
       />
     </div>
   </div>

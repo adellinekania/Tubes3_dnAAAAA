@@ -26,7 +26,7 @@ onMounted(async () => {
   let namaPengguna = await store.data.nama;
   let prediksiPenyakit = await store.data.penyakit;
   let sequenceDNA = await store.data.file.file.arrayBuffer();
-  let metode = "KMP";
+  let metode = await store.data.metode;
   let dnaFile = new Blob([sequenceDNA])
 
   const formData = new FormData();
@@ -35,14 +35,22 @@ onMounted(async () => {
   formData.append("metodeStringMatching", metode)
   formData.append("sequenceDNA", dnaFile, 'sequence.txt')
 
-  const testResult = await axios.post('/api/tesDNA', formData)
+  try {
+    const testResult = await axios.post('/api/tesDNA', formData)
 
-  result.isLoading = false;
-  result.nama = testResult.data.Data.Nama_pengguna;
-  result.penyakit = testResult.data.Data.Prediksi_penyakit;
-  result.date = new Date();
-  result.isMatch = testResult.data.Data.Hasil_tes;
-  result.isError = false;
+    result.isLoading = false;
+    result.nama = testResult.data.Data.Nama_pengguna;
+    result.penyakit = testResult.data.Data.Prediksi_penyakit;
+    result.date = new Date();
+    result.isMatch = testResult.data.Data.Hasil_tes;
+    result.isError = false;
+  } catch (e) {
+    result.isLoading = false;
+    result.nama = store.data.nama;
+    result.penyakit = store.data.penyakit;
+    result.date = new Date();
+    result.isError = true;
+  }
 
   store.reset();
 });
@@ -100,7 +108,7 @@ const props = computed(() => {
               <tbody>
               <tr>
                 <td>Waktu</td>
-                <td>: 2022/04/25 13:29</td>
+                <td>: {{ result.date.toLocaleDateString() }}</td>
               </tr>
               <tr>
                 <td>Nama</td>
