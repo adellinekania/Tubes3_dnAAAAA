@@ -7,14 +7,12 @@ import {
 } from 'naive-ui';
 
 import SearchIcon from '@/assets/icons/Search.svg';
+import axios from "axios";
 
 const columns = [
   {
     title: 'Waktu',
     key: 'waktu',
-    render(row) {
-      return row.waktu.toISOString();
-    },
   },
   {
     title: 'Nama',
@@ -41,23 +39,28 @@ const columns = [
 ];
 
 const filter = ref(null);
-const data = reactive([]);
+let data = reactive([]);
 const isLoading = ref(false);
 
 const fetchData = () => {
-  // API call based on filter value...
   isLoading.value = true;
-  setTimeout(() => {
-    for (let i = 1; i <= 100; i++) {
+  let url = "/api/tesDNA"
+  if (filter.value !== null) {
+    url += `/${filter.value}`
+  }
+  console.log(url)
+  axios.get(url).then(res => {
+    res.data.Data.forEach(d => {
       data.push({
-        nama: `Nama ${i}`,
-        waktu: new Date(),
-        prediksi: `Prediksi ${i}`,
-        result: i % 2 === 0,
+        nama: d.nama_pengguna,
+        waktu: d.tanggal,
+        prediksi: d.prediksi_penyakit,
+        result: d.hasil_tes,
       });
-    }
+    })
+    console.log(data);
     isLoading.value = false;
-  }, 2000);
+  })
 };
 
 onMounted(() => {

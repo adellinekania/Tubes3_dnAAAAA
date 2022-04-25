@@ -36,10 +36,11 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/api/upload", handler.CreatePenyakit).Methods("POST")
 	router.HandleFunc("/api/tesDNA", handler.CreateTesDNA).Methods("POST")
+	router.HandleFunc("/api/penyakit", handler.GetPenyakit).Methods("GET")
 	router.HandleFunc("/api/tesDNA", handler.GetAllTesDNA).Methods("GET")
 	router.HandleFunc("/api/tesDNA/{query}", handler.GetAllTesDNA).Methods("GET")
 	router.HandleFunc("/api/test", handler.ApiTest).Methods("GET")
-	err = http.ListenAndServe(":3000", router)
+	err = http.ListenAndServe(":5000", router)
 	if err != nil {
 		fmt.Println(err)
 	}

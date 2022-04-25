@@ -31,18 +31,6 @@ const handleClick = () => {
     .then(() => router.push({ name: 'post' }))
     .catch(() => {});
 };
-
-const listPenyakit = reactive([]);
-
-onMounted(async () => {
-  // API call...
-  for (let i = 1; i <= 50; i++) {
-    listPenyakit.push({
-      label: `Penyakit ${i}`,
-      value: `penyakit${i}`,
-    });
-  }
-});
 </script>
 
 <template>

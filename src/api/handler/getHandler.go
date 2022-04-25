@@ -29,7 +29,41 @@ func ApiTest(response http.ResponseWriter, request *http.Request) {
 	response.WriteHeader(http.StatusCreated)
 
 	json.NewEncoder(response).Encode(Tes{
-		Message: "Successfully get tes DNA",
+		Message: "Successfully get penyakit",
+	})
+
+}
+
+func GetPenyakit(response http.ResponseWriter, request *http.Request) {
+
+	response.Header().Set("Content-Type", "application/json")
+
+	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	defer client.Disconnect(ctx)
+
+	penyakitCollection := client.Database("dna").Collection("penyakit")
+
+	cursor, err := penyakitCollection.Find(ctx, bson.M{})
+
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var result []bson.M
+	if err = cursor.All(ctx, &result); err != nil {
+		fmt.Println(err)
+	}
+
+	response.WriteHeader(http.StatusCreated)
+
+	json.NewEncoder(response).Encode(TesDNAResults{
+		Message: "Successfully get penyakit",
+		Data:    result,
 	})
 
 }
@@ -38,7 +72,6 @@ func GetAllTesDNA(response http.ResponseWriter, request *http.Request) {
 
 	vars := mux.Vars(request)
 	query := vars["query"]
-	fmt.Println("INI WUERY", query == "")
 
 	isQueryValid, message, date, penyakit := true, "", "", ""
 

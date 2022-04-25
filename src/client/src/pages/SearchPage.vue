@@ -8,6 +8,7 @@ import {
 import InlineFileInput from '@/components/form/InlineFileInput.vue';
 import SearchIcon from '@/assets/icons/Search.svg';
 import { useStore as useSearchStore } from '@/stores/search';
+import axios from "axios";
 
 const searchStore = useSearchStore();
 
@@ -39,13 +40,13 @@ const handleClick = () => {
 
 const listPenyakit = reactive([]);
 onMounted(async () => {
-  // API call...
-  for (let i = 1; i <= 50; i++) {
+  const penyakit = await axios.get('/api/penyakit')
+  penyakit.data.Data.forEach(d => {
     listPenyakit.push({
-      label: `Penyakit ${i}`,
-      value: `penyakit${i}`,
-    });
-  }
+      label: d.nama_penyakit,
+      value: d.nama_penyakit
+    })
+  })
 });
 
 </script>
