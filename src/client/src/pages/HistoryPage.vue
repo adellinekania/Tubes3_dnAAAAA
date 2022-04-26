@@ -42,7 +42,7 @@ const columns = [
 ];
 
 const tableRef = ref(null);
-const filter = ref(null);
+const filter = ref('');
 const data = reactive([]);
 
 const fetchData = () => {
@@ -76,7 +76,11 @@ onMounted(() => {
   fetchData();
 });
 
-const handleClick = () => fetchData();
+const handleChange = () => {
+  if (filter.value !== '') {
+    fetchData();
+  }
+};
 </script>
 
 <template>
@@ -87,11 +91,12 @@ const handleClick = () => fetchData();
         <NInput
           v-model:value="filter"
           placeholder="Masukkan pencarian..."
+          @change="handleChange"
         />
         <NButton
           type="primary"
           size="large"
-          @click="handleClick"
+          @click="handleChange"
         >
           <template #icon>
             <NIcon>
