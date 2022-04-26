@@ -60,7 +60,6 @@ watch(() => route.name, () => {
         #="{ href, navigate }"
       >
         <div
-          :href="href"
           class="brand"
           @click="navigate"
         >
@@ -153,15 +152,18 @@ h1 {
 
 .horizontal {
   opacity: 0;
+  visibility: hidden;
 }
 
 @include sass-mq.mq($from: tablet) {
   .horizontal {
     opacity: 1;
+    visibility: visible;
   }
 
   .control {
     opacity: 0;
+    visibility: hidden;
   }
 }
 </style>
