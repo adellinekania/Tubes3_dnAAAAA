@@ -1,8 +1,8 @@
 <script setup>
 import { useRouter } from 'vue-router';
 
-import FileInput from '@/components/form/FileInput.vue';
 import { useStore as useSearchStore } from '@/stores/search';
+import FileInput from '@/components/form/FileInput.vue';
 
 const router = useRouter();
 const searchStore = useSearchStore();

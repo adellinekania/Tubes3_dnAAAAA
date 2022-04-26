@@ -5,10 +5,11 @@ import {
   NCard, NForm, NFormItem, NInput, NSelect, NButton, NIcon,
 } from 'naive-ui';
 
-import InlineFileInput from '@/components/form/InlineFileInput.vue';
-import SearchIcon from '@/assets/icons/Search.svg';
 import { useStore as useSearchStore } from '@/stores/search';
-import axios from 'axios';
+import { api } from '@/services/api';
+import InlineFileInput from '@/components/form/InlineFileInput.vue';
+import EmptyStatus from '@/components/display/EmptyStatus.vue';
+import SearchIcon from '@/assets/icons/Search.svg';
 
 const searchStore = useSearchStore();
 
@@ -43,14 +44,13 @@ const handleClick = () => {
     });
 };
 
-const listPenyakit = reactive([]);
 const listMetode = reactive([]);
 const metodeMap = {
   KMP: 'Knuth–Morris–Pratt',
   BM: 'Boyer Moore',
 };
 
-onMounted(async () => {
+onMounted(() => {
   // eslint-disable-next-line no-restricted-syntax, guard-for-in
   for (const key in metodeMap) {
     listMetode.push({
@@ -58,17 +58,30 @@ onMounted(async () => {
       value: key,
     });
   }
-
-  const penyakit = await axios.get('/api/penyakit');
-  if (penyakit.data.Data) {
-    penyakit.data.Data.forEach((d) => {
-      listPenyakit.push({
-        label: d.nama_penyakit,
-        value: d.nama_penyakit,
-      });
-    });
-  }
 });
+
+const listPenyakit = reactive([]);
+
+const fetchData = async () => {
+  listPenyakit.isLoading = true;
+  try {
+    const penyakit = await api.get('/penyakit');
+    if (penyakit.data.Data) {
+      penyakit.data.Data.forEach((d) => {
+        listPenyakit.push({
+          label: d.nama_penyakit,
+          value: d.nama_penyakit,
+        });
+      });
+    }
+  } catch (err) {
+    listPenyakit.error = err;
+  } finally {
+    listPenyakit.isLoading = false;
+  }
+};
+
+onMounted(fetchData);
 
 </script>
 
@@ -108,13 +121,21 @@ onMounted(async () => {
           <NSelect
             v-model:value="input.penyakit"
             placeholder="Masukkan nama penyakit yang diprediksi"
+            :loading="listPenyakit.isLoading"
             size="large"
             filterable
             :options="listPenyakit"
             :input-props="{
               autocomplete: 'disabled'
             }"
-          />
+          >
+            <template #empty>
+              <EmptyStatus
+                :error="listPenyakit.error"
+                @retry="fetchData"
+              />
+            </template>
+          </NSelect>
         </NFormItem>
         <NFormItem
           label="Metode Pencocokan String"

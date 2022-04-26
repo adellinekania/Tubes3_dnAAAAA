@@ -6,8 +6,8 @@ import {
 } from 'naive-ui';
 
 import { useStore } from '@/stores/search';
+import { api } from '@/services/api';
 import SearchIcon from '@/assets/icons/Search.svg';
-import axios from 'axios';
 
 const store = useStore();
 
@@ -21,6 +21,11 @@ const result = reactive({
 });
 
 onMounted(async () => {
+  if (store.data.file == null) {
+    router.replace({ name: 'search' });
+    return;
+  }
+
   result.isLoading = true;
 
   const namaPengguna = await store.data.nama;
@@ -36,7 +41,7 @@ onMounted(async () => {
   formData.append('sequenceDNA', dnaFile, 'sequence.txt');
 
   try {
-    const testResult = await axios.post('/api/tesDNA', formData);
+    const testResult = await api.post('/tesDNA', formData);
 
     result.isLoading = false;
     result.nama = testResult.data.Data.Nama_pengguna;
@@ -44,14 +49,14 @@ onMounted(async () => {
     result.kemiripan = (testResult.data.Data.Persentase_kemiripan * 100).toFixed(2);
     result.date = new Date();
     result.isMatch = testResult.data.Data.Hasil_tes;
-    result.isError = false;
+    result.error = null;
   } catch (e) {
     result.isLoading = false;
     result.nama = store.data.nama;
     result.penyakit = store.data.penyakit;
     result.kemiripan = 0;
     result.date = new Date();
-    result.isError = true;
+    result.error = e;
   }
 
   store.reset();
@@ -62,11 +67,16 @@ const props = computed(() => {
     return {};
   }
 
-  if (result.isError) {
+  if (result.error) {
+    let message = 'Gagal melakukan pencocokan DNA penyakit';
+    if (result.error.response?.data?.Message) {
+      message += `: ${result.error.response.data.Message}`;
+    }
+
     return {
       status: 'error',
       title: 'Gagal',
-      description: 'Gagal melakukan pencocokan DNA penyakit',
+      description: message,
     };
   }
 
@@ -113,21 +123,25 @@ const props = computed(() => {
             <table>
               <tbody>
                 <tr>
-                  <td>Waktu</td>
-                  <td>: {{ result.date.toLocaleDateString() }}</td>
+                  <td>Tanggal</td>
+                  <td>:</td>
+                  <td>{{ result.date.toLocaleDateString() }}</td>
                 </tr>
                 <tr>
                   <td>Nama</td>
-                  <td>: {{ result.nama }}</td>
+                  <td>:</td>
+                  <td>{{ result.nama }}</td>
                   <td />
                 </tr>
                 <tr>
                   <td>Penyakit</td>
-                  <td>: {{ result.penyakit }}</td>
+                  <td>:</td>
+                  <td>{{ result.penyakit }}</td>
                 </tr>
                 <tr>
                   <td>Kemiripan</td>
-                  <td>: {{ result.kemiripan }}%</td>
+                  <td>:</td>
+                  <td>{{ result.kemiripan }}%</td>
                 </tr>
               </tbody>
             </table>
@@ -167,7 +181,6 @@ const props = computed(() => {
   justify-content: center;
 
   table {
-    width: 250px;
     text-align: left;
   }
 }

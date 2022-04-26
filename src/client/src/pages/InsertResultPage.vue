@@ -1,18 +1,25 @@
 <script setup>
 import { onMounted, reactive, computed } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   NCard, NResult, NSpin,
 } from 'naive-ui';
 
 import { useStore } from '@/stores/insert';
-import axios from 'axios';
+import { api } from '@/services/api';
 
 const store = useStore();
 const result = reactive({
   isLoading: true,
 });
 
+const router = useRouter();
 onMounted(async () => {
+  if (store.data.file == null) {
+    router.replace({ name: 'new' });
+    return;
+  }
+
   result.isLoading = true;
 
   const namaPenyakit = await store.data.penyakit;
@@ -24,17 +31,17 @@ onMounted(async () => {
   formData.append('sequenceDNA', dnaFile, 'sequence.txt');
 
   try {
-    const testResult = await axios.post('/api/upload', formData);
+    const testResult = await api.post('/upload', formData);
 
     result.isLoading = false;
     result.penyakit = testResult.data.Data.Nama_penyakit;
     result.date = new Date();
-    result.isError = false;
+    result.error = null;
   } catch (e) {
     result.isLoading = false;
     result.penyakit = store.data.penyakit;
     result.date = new Date();
-    result.isError = true;
+    result.error = e;
   }
 
   store.reset();
@@ -45,11 +52,16 @@ const props = computed(() => {
     return {};
   }
 
-  if (result.isError) {
+  if (result.error) {
+    let message = 'Data penyakit gagal ditambahkan';
+    if (result.error.response?.data?.Message) {
+      message += `: ${result.error.response.data.Message}`;
+    }
+
     return {
       status: 'error',
       title: 'Gagal',
-      description: 'Data penyakit gagal dimasukkan',
+      description: message,
     };
   }
 
@@ -88,12 +100,14 @@ const props = computed(() => {
             <table>
               <tbody>
                 <tr>
-                  <td>Waktu</td>
-                  <td>: {{ result.date.toLocaleDateString() }}</td>
+                  <td>Tanggal</td>
+                  <td>:</td>
+                  <td>{{ result.date.toLocaleDateString() }}</td>
                 </tr>
                 <tr>
                   <td>Penyakit</td>
-                  <td>: {{ result.penyakit }}</td>
+                  <td>:</td>
+                  <td>{{ result.penyakit }}</td>
                 </tr>
               </tbody>
             </table>
@@ -116,7 +130,6 @@ const props = computed(() => {
   justify-content: center;
 
   table {
-    width: 250px;
     text-align: left;
   }
 }

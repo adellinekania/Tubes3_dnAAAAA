@@ -56,10 +56,10 @@ const filename = computed(() => {
     >
       <NInputGroup style="display: flex; max-width: 100%;">
         <NInput
+          ref="textField"
           placeholder="Pilih file..."
           size="large"
           :value="filename"
-          @change.prevent
         />
         <NButton
           type="primary"

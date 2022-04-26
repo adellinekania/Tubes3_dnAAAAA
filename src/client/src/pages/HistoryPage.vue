@@ -3,16 +3,19 @@ import {
   h, onMounted, reactive, ref,
 } from 'vue';
 import {
-  NDataTable, NInputGroup, NInput, NButton, NIcon, NTag, NEmpty,
+  NDataTable, NInputGroup, NInput, NButton, NIcon, NTag,
 } from 'naive-ui';
 
+import { api } from '@/services/api';
+import EmptyStatus from '@/components/display/EmptyStatus.vue';
 import SearchIcon from '@/assets/icons/Search.svg';
-import axios from 'axios';
 
 const columns = [
   {
-    title: 'Waktu',
+    title: 'Tanggal',
     key: 'waktu',
+    // sortOrder: 'descend',
+    // sorter: 'default',
   },
   {
     title: 'Nama',
@@ -29,7 +32,7 @@ const columns = [
       return h(
         NTag,
         {
-          type: row.result ? 'success' : 'error',
+          type: row.result ? 'warning' : '',
           size: 'large',
         },
         { default: () => (row.result ? 'Positif' : 'Negatif') },
@@ -38,19 +41,18 @@ const columns = [
   },
 ];
 
+const tableRef = ref(null);
 const filter = ref(null);
 const data = reactive([]);
-const isLoading = ref(false);
-const emptyMsg = ref('Tidak ada riwayat');
 
 const fetchData = () => {
-  isLoading.value = true;
-  let url = '/api/tesDNA';
+  data.isLoading = true;
+  let url = '/tesDNA';
   if (filter.value !== null && filter.value !== '') {
     url += `/${filter.value}`;
   }
   data.length = 0;
-  axios.get(url).then((res) => {
+  api.get(url).then((res) => {
     if (res.data.Data) {
       res.data.Data.forEach((d) => {
         data.push({
@@ -61,10 +63,12 @@ const fetchData = () => {
         });
       });
     }
-    isLoading.value = false;
+    tableRef.value.sort('waktu');
+    data.error = null;
   }).catch((err) => {
-    emptyMsg.value = err.response.data.Message;
-    isLoading.value = false;
+    data.error = err;
+  }).finally(() => {
+    data.isLoading = false;
   });
 };
 
@@ -83,11 +87,11 @@ const handleClick = () => fetchData();
         <NInput
           v-model:value="filter"
           placeholder="Masukkan pencarian..."
-          @click="handleClick"
         />
         <NButton
           type="primary"
           size="large"
+          @click="handleClick"
         >
           <template #icon>
             <NIcon>
@@ -99,15 +103,16 @@ const handleClick = () => fetchData();
     </div>
     <div class="table">
       <NDataTable
-        :loading="isLoading"
+        ref="tableRef"
+        :loading="data.isLoading"
         :columns="columns"
         :data="data"
         :pagination="{ pageSize: 10 }"
       >
         <template #empty>
-          <NEmpty
-            :description="emptyMsg"
-            size="large"
+          <EmptyStatus
+            :error="data.error"
+            @retry="handleClick"
           />
         </template>
       </NDataTable>
