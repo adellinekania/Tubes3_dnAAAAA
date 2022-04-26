@@ -7,6 +7,7 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   server: {
+    historyApiFallback: true,
     proxy: {
       '/api': 'http://localhost:5000'
     }
