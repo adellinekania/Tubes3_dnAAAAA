@@ -45,20 +45,24 @@ const isLoading = ref(false);
 const fetchData = () => {
   isLoading.value = true;
   let url = '/api/tesDNA';
-  if (filter.value !== null) {
+  if (filter.value !== null && filter.value !== '') {
     url += `/${filter.value}`;
   }
-  console.log(url);
+  data.length = 0;
   axios.get(url).then((res) => {
-    res.data.Data.forEach((d) => {
-      data.push({
-        nama: d.nama_pengguna,
-        waktu: d.tanggal,
-        prediksi: d.prediksi_penyakit,
-        result: d.hasil_tes,
+    if (res.data.Data) {
+      res.data.Data.forEach((d) => {
+        data.push({
+          nama: d.nama_pengguna,
+          waktu: d.tanggal,
+          prediksi: d.prediksi_penyakit,
+          result: d.hasil_tes,
+        });
       });
-    });
-    console.log(data);
+    }
+    isLoading.value = false;
+  }).catch((err) => {
+    alert(err.response.data.Message);
     isLoading.value = false;
   });
 };

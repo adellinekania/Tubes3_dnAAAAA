@@ -26,7 +26,7 @@ onMounted(async () => {
   const namaPengguna = await store.data.nama;
   const prediksiPenyakit = await store.data.penyakit;
   const sequenceDNA = await store.data.file.file.arrayBuffer();
-  const metode = 'KMP';
+  const metode = await store.data.metode;
   const dnaFile = new Blob([sequenceDNA]);
 
   const formData = new FormData();
@@ -35,14 +35,24 @@ onMounted(async () => {
   formData.append('metodeStringMatching', metode);
   formData.append('sequenceDNA', dnaFile, 'sequence.txt');
 
-  const testResult = await axios.post('/api/tesDNA', formData);
+  try {
+    const testResult = await axios.post('/api/tesDNA', formData);
 
-  result.isLoading = false;
-  result.nama = testResult.data.Data.Nama_pengguna;
-  result.penyakit = testResult.data.Data.Prediksi_penyakit;
-  result.date = new Date();
-  result.isMatch = testResult.data.Data.Hasil_tes;
-  result.isError = false;
+    result.isLoading = false;
+    result.nama = testResult.data.Data.Nama_pengguna;
+    result.penyakit = testResult.data.Data.Prediksi_penyakit;
+    result.kemiripan = (testResult.data.Data.Persentase_kemiripan * 100).toFixed(2);
+    result.date = new Date();
+    result.isMatch = testResult.data.Data.Hasil_tes;
+    result.isError = false;
+  } catch (e) {
+    result.isLoading = false;
+    result.nama = store.data.nama;
+    result.penyakit = store.data.penyakit;
+    result.kemiripan = 0;
+    result.date = new Date();
+    result.isError = true;
+  }
 
   store.reset();
 });
@@ -104,7 +114,7 @@ const props = computed(() => {
               <tbody>
                 <tr>
                   <td>Waktu</td>
-                  <td>: 2022/04/25 13:29</td>
+                  <td>: {{ result.date.toLocaleDateString() }}</td>
                 </tr>
                 <tr>
                   <td>Nama</td>
@@ -114,6 +124,10 @@ const props = computed(() => {
                 <tr>
                   <td>Penyakit</td>
                   <td>: {{ result.penyakit }}</td>
+                </tr>
+                <tr>
+                  <td>Kemiripan</td>
+                  <td>: {{ result.kemiripan }}%</td>
                 </tr>
               </tbody>
             </table>

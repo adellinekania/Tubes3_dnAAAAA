@@ -37,7 +37,10 @@ func CreatePenyakit(response http.ResponseWriter, request *http.Request) {
 	namaPenyakit := request.FormValue("namaPenyakit")
 
 	if err != nil {
-		fmt.Println(err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(response).Encode(PenyakitResult{
+			Message: "File sequence DNA tidak valid",
+		})
 		return
 	}
 
@@ -71,7 +74,11 @@ func CreatePenyakit(response http.ResponseWriter, request *http.Request) {
 
 	result, insertErr := col.InsertOne(context.TODO(), oneDoc)
 	if insertErr != nil {
-		fmt.Println(insertErr)
+		response.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(response).Encode(PenyakitResult{
+			Message: "Error when insert to database",
+		})
+		return
 	} else {
 		fmt.Println("Inserted a single document: ", reflect.TypeOf(result))
 	}
@@ -112,10 +119,13 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 	prediksiPenyakit := request.FormValue("prediksiPenyakit")
 	metodeStringMatching := request.FormValue("metodeStringMatching")
 
-	tanggal := time.Now().Format("02 January 2006")
+	tanggal := time.Now().Format("January 02, 2006")
 
 	if err != nil {
-		fmt.Println(err)
+		response.WriteHeader(http.StatusUnprocessableEntity)
+		json.NewEncoder(response).Encode(TesDNAResult{
+			Message: "File sequence DNA tidak valid",
+		})
 		return
 	}
 
@@ -195,7 +205,11 @@ func CreateTesDNA(response http.ResponseWriter, request *http.Request) {
 
 	result, insertErr := tesDNACollections.InsertOne(context.TODO(), oneDoc)
 	if insertErr != nil {
-		fmt.Println(insertErr)
+		response.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(response).Encode(PenyakitResult{
+			Message: "Error when insert to database",
+		})
+		return
 	} else {
 		fmt.Println("Inserted a single document: ", reflect.TypeOf(result))
 	}

@@ -23,6 +23,10 @@ const rules = {
     required: true,
     message: 'Prediksi penyakit harus diisi',
   },
+  metode: {
+    required: true,
+    message: 'Metode harus diisi',
+  },
   file: {
     required: true,
     message: 'File DNA harus dipilih',
@@ -35,18 +39,34 @@ const router = useRouter();
 const handleClick = () => {
   formRef.value?.validate()
     .then(() => router.push({ name: 'result' }))
-    .catch(() => {});
+    .catch(() => {
+    });
 };
 
 const listPenyakit = reactive([]);
+const listMetode = reactive([]);
+const metodeMap = {
+  KMP: 'Knuth–Morris–Pratt',
+  BM: 'Boyer Moore',
+};
+
 onMounted(async () => {
-  const penyakit = await axios.get('/api/penyakit');
-  penyakit.data.Data.forEach((d) => {
-    listPenyakit.push({
-      label: d.nama_penyakit,
-      value: d.nama_penyakit,
+  for (const key in metodeMap) {
+    listMetode.push({
+      label: metodeMap[key],
+      value: key,
     });
-  });
+  }
+
+  const penyakit = await axios.get('/api/penyakit');
+  if (penyakit.data.Data) {
+    penyakit.data.Data.forEach((d) => {
+      listPenyakit.push({
+        label: d.nama_penyakit,
+        value: d.nama_penyakit,
+      });
+    });
+  }
 });
 
 </script>
@@ -90,6 +110,21 @@ onMounted(async () => {
             size="large"
             filterable=""
             :options="listPenyakit"
+            :input-props="{
+              autocomplete: 'disabled'
+            }"
+          />
+        </NFormItem>
+        <NFormItem
+          label="Metode Pencocokan String"
+          path="metode"
+        >
+          <NSelect
+            v-model:value="input.metode"
+            placeholder="Pilih metode pencocokan string"
+            size="large"
+            filterable=""
+            :options="listMetode"
             :input-props="{
               autocomplete: 'disabled'
             }"

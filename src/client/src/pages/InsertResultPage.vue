@@ -23,12 +23,19 @@ onMounted(async () => {
   formData.append('namaPenyakit', namaPenyakit);
   formData.append('sequenceDNA', dnaFile, 'sequence.txt');
 
-  const testResult = await axios.post('/api/upload', formData);
+  try {
+    const testResult = await axios.post('/api/upload', formData);
 
-  result.isLoading = false;
-  result.penyakit = testResult.data.Data.Nama_penyakit;
-  result.date = new Date();
-  result.isError = false;
+    result.isLoading = false;
+    result.penyakit = testResult.data.Data.Nama_penyakit;
+    result.date = new Date();
+    result.isError = false;
+  } catch (e) {
+    result.isLoading = false;
+    result.penyakit = store.data.penyakit;
+    result.date = new Date();
+    result.isError = true;
+  }
 
   store.reset();
 });
@@ -82,7 +89,7 @@ const props = computed(() => {
               <tbody>
                 <tr>
                   <td>Waktu</td>
-                  <td>: 2022/04/25 13:29</td>
+                  <td>: {{ result.date.toLocaleDateString() }}</td>
                 </tr>
                 <tr>
                   <td>Penyakit</td>

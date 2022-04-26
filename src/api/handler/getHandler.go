@@ -22,7 +22,7 @@ type TesDNAResults struct {
 }
 
 type Tes struct {
-    Message string
+	Message string
 }
 
 func ApiTest(response http.ResponseWriter, request *http.Request) {
@@ -92,7 +92,12 @@ func GetAllTesDNA(response http.ResponseWriter, request *http.Request) {
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 	if err != nil {
-		fmt.Println(err)
+		response.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(response).Encode(TesDNAResults{
+			Message: "Could not fetch data from database",
+			Data:    nil,
+		})
+		return
 	}
 
 	defer client.Disconnect(ctx)
@@ -109,16 +114,25 @@ func GetAllTesDNA(response http.ResponseWriter, request *http.Request) {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		response.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(response).Encode(TesDNAResults{
+			Message: "Could not fetch data from database",
+			Data:    nil,
+		})
+		return
 	}
 
 	var result []bson.M
 	if err = cursor.All(ctx, &result); err != nil {
-		fmt.Println(err)
+		response.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(response).Encode(TesDNAResults{
+			Message: "Could not fetch data from database",
+			Data:    nil,
+		})
+		return
 	}
 
 	response.WriteHeader(http.StatusCreated)
-
 	json.NewEncoder(response).Encode(TesDNAResults{
 		Message: "Successfully get tes DNA",
 		Data:    result,
