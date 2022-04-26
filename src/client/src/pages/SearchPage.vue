@@ -8,7 +8,7 @@ import {
 import InlineFileInput from '@/components/form/InlineFileInput.vue';
 import SearchIcon from '@/assets/icons/Search.svg';
 import { useStore as useSearchStore } from '@/stores/search';
-import axios from "axios";
+import axios from 'axios';
 
 const searchStore = useSearchStore();
 
@@ -40,13 +40,13 @@ const handleClick = () => {
 
 const listPenyakit = reactive([]);
 onMounted(async () => {
-  const penyakit = await axios.get('/api/penyakit')
-  penyakit.data.Data.forEach(d => {
+  const penyakit = await axios.get('/api/penyakit');
+  penyakit.data.Data.forEach((d) => {
     listPenyakit.push({
       label: d.nama_penyakit,
-      value: d.nama_penyakit
-    })
-  })
+      value: d.nama_penyakit,
+    });
+  });
 });
 
 </script>
@@ -54,13 +54,17 @@ onMounted(async () => {
 <template>
   <div class="page-container search">
     <NCard
-      title="Tes DNA"
       :segmented="{
         content: true,
         footer: 'soft'
       }"
-      class="search-form-box"
+      class="center-box search-form-box"
     >
+      <template #header>
+        <div class="box-header">
+          Tes DNA
+        </div>
+      </template>
       <NForm
         ref="formRef"
         :model="input"
@@ -119,16 +123,5 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/styles/layout";
-
-.search-form-box {
-  width: layout.$form-box-width;
-  margin: layout.$content-margin;
-}
-
-.action {
-  display: flex;
-  justify-content: end;
-}
-
+@use "@/assets/styles/box";
 </style>

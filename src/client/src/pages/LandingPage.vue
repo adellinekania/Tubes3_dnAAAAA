@@ -26,6 +26,7 @@ const handleFileInput = async (file) => {
 </template>
 
 <style lang="scss" scoped>
+@use "@/assets/styles/layout";
 @use '@/assets/styles/fonts';
 
 .brand {
@@ -33,6 +34,7 @@ const handleFileInput = async (file) => {
   flex-direction: column;
   align-items: center;
   padding-bottom: 2rem;
+  width: layout.$content-width;
 }
 
 h1 {
@@ -43,6 +45,6 @@ h1 {
 
 .input {
   padding-bottom: 5rem;
-  width: min(100%, 650px);
+  width: min(layout.$content-width, 650px);
 }
 </style>

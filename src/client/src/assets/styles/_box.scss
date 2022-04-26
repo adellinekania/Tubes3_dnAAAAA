@@ -1,0 +1,14 @@
+@use "layout";
+
+.center-box {
+  width: min(layout.$form-box-width, layout.$content-width);
+
+  .box-header {
+    text-align: center;
+  }
+
+  .action {
+    display: flex;
+    justify-content: end;
+  }
+}

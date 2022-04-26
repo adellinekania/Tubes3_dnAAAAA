@@ -7,7 +7,7 @@ import {
 } from 'naive-ui';
 
 import SearchIcon from '@/assets/icons/Search.svg';
-import axios from "axios";
+import axios from 'axios';
 
 const columns = [
   {
@@ -39,28 +39,28 @@ const columns = [
 ];
 
 const filter = ref(null);
-let data = reactive([]);
+const data = reactive([]);
 const isLoading = ref(false);
 
 const fetchData = () => {
   isLoading.value = true;
-  let url = "/api/tesDNA"
+  let url = '/api/tesDNA';
   if (filter.value !== null) {
-    url += `/${filter.value}`
+    url += `/${filter.value}`;
   }
-  console.log(url)
-  axios.get(url).then(res => {
-    res.data.Data.forEach(d => {
+  console.log(url);
+  axios.get(url).then((res) => {
+    res.data.Data.forEach((d) => {
       data.push({
         nama: d.nama_pengguna,
         waktu: d.tanggal,
         prediksi: d.prediksi_penyakit,
         result: d.hasil_tes,
       });
-    })
+    });
     console.log(data);
     isLoading.value = false;
-  })
+  });
 };
 
 onMounted(() => {
@@ -104,19 +104,26 @@ const handleClick = () => fetchData();
 </template>
 
 <style lang="scss" scoped>
+@use "@/assets/styles/layout";
+
 .history {
   justify-content: start;
-  // margin-top: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin-top: 20px;
 }
 
 .history-search {
+  align-items: center;
   margin-top: 10px;
-  width: 550px;
+  width: min(550px, layout.$content-width);
   display: flex;
 }
 
 .table {
-  width: 100%;
+  width: layout.$content-width;
   max-width: 960px;
   margin-top: 25px;
 }

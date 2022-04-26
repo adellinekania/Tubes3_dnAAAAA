@@ -1,11 +1,11 @@
 <script setup>
-import {onMounted, reactive, computed} from 'vue';
+import { onMounted, reactive, computed } from 'vue';
 import {
   NCard, NResult, NSpin,
 } from 'naive-ui';
 
-import {useStore} from '@/stores/insert';
-import axios from "axios";
+import { useStore } from '@/stores/insert';
+import axios from 'axios';
 
 const store = useStore();
 const result = reactive({
@@ -15,15 +15,15 @@ const result = reactive({
 onMounted(async () => {
   result.isLoading = true;
 
-  let namaPenyakit = await store.data.penyakit;
-  let sequenceDNA = await store.data.file.file.arrayBuffer();
-  let dnaFile = new Blob([sequenceDNA])
+  const namaPenyakit = await store.data.penyakit;
+  const sequenceDNA = await store.data.file.file.arrayBuffer();
+  const dnaFile = new Blob([sequenceDNA]);
 
   const formData = new FormData();
-  formData.append("namaPenyakit", namaPenyakit)
-  formData.append("sequenceDNA", dnaFile, 'sequence.txt')
+  formData.append('namaPenyakit', namaPenyakit);
+  formData.append('sequenceDNA', dnaFile, 'sequence.txt');
 
-  const testResult = await axios.post('/api/upload', formData)
+  const testResult = await axios.post('/api/upload', formData);
 
   result.isLoading = false;
   result.penyakit = testResult.data.Data.Nama_penyakit;
@@ -58,32 +58,36 @@ const props = computed(() => {
 <template>
   <div class="page-container result">
     <NCard
-        title="Tambahkan DNA Penyakit Baru"
-        :segmented="{
+      :segmented="{
         content: true,
         footer: 'soft'
       }"
-        class="result-box"
+      class="center-box result-box"
     >
+      <template #header>
+        <div class="box-header">
+          Tambahkan DNA Penyakit Baru
+        </div>
+      </template>
       <div v-if="result.isLoading">
-        <NSpin size="large"/>
+        <NSpin size="large" />
       </div>
       <NResult
-          v-else
-          v-bind="props"
+        v-else
+        v-bind="props"
       >
         <template #footer>
           <div class="result-content">
             <table>
               <tbody>
-              <tr>
-                <td>Waktu</td>
-                <td>: 2022/04/25 13:29</td>
-              </tr>
-              <tr>
-                <td>Penyakit</td>
-                <td>: {{ result.penyakit }}</td>
-              </tr>
+                <tr>
+                  <td>Waktu</td>
+                  <td>: 2022/04/25 13:29</td>
+                </tr>
+                <tr>
+                  <td>Penyakit</td>
+                  <td>: {{ result.penyakit }}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -94,11 +98,9 @@ const props = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/styles/layout";
+@use "@/assets/styles/box";
 
 .result-box {
-  width: layout.$form-box-width;
-  margin: layout.$content-margin;
   text-align: center;
 }
 

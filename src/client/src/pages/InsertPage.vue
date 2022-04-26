@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue';
+import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import {
   NCard, NForm, NFormItem, NInput, NButton, NIcon,
@@ -36,13 +36,17 @@ const handleClick = () => {
 <template>
   <div class="page-container insert">
     <NCard
-      title="Tambahkan DNA Penyakit Baru"
       :segmented="{
         content: true,
         footer: 'soft'
       }"
-      class="insert-form-box"
+      class="center-box insert-form-box"
     >
+      <template #header>
+        <div class="box-header">
+          Tambahkan DNA Penyakit Baru
+        </div>
+      </template>
       <NForm
         ref="formRef"
         :model="input"
@@ -86,15 +90,5 @@ const handleClick = () => {
 </template>
 
 <style lang="scss" scoped>
-@use "@/assets/styles/layout";
-
-.insert-form-box {
-  width: layout.$form-box-width;
-}
-
-.action {
-  display: flex;
-  justify-content: end;
-}
-
+@use "@/assets/styles/box";
 </style>
