@@ -3,7 +3,7 @@ import {
   h, onMounted, reactive, ref,
 } from 'vue';
 import {
-  NDataTable, NInputGroup, NInput, NButton, NIcon, NTag,
+  NDataTable, NInputGroup, NInput, NButton, NIcon, NTag, NEmpty,
 } from 'naive-ui';
 
 import SearchIcon from '@/assets/icons/Search.svg';
@@ -41,6 +41,7 @@ const columns = [
 const filter = ref(null);
 const data = reactive([]);
 const isLoading = ref(false);
+const emptyMsg = ref('Tidak ada riwayat');
 
 const fetchData = () => {
   isLoading.value = true;
@@ -62,7 +63,7 @@ const fetchData = () => {
     }
     isLoading.value = false;
   }).catch((err) => {
-    alert(err.response.data.Message);
+    emptyMsg.value = err.response.data.Message;
     isLoading.value = false;
   });
 };
@@ -102,7 +103,14 @@ const handleClick = () => fetchData();
         :columns="columns"
         :data="data"
         :pagination="{ pageSize: 10 }"
-      />
+      >
+        <template #empty>
+          <NEmpty
+            :description="emptyMsg"
+            size="large"
+          />
+        </template>
+      </NDataTable>
     </div>
   </div>
 </template>

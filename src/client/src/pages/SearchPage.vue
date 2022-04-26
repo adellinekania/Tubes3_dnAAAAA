@@ -51,6 +51,7 @@ const metodeMap = {
 };
 
 onMounted(async () => {
+  // eslint-disable-next-line no-restricted-syntax, guard-for-in
   for (const key in metodeMap) {
     listMetode.push({
       label: metodeMap[key],
@@ -108,7 +109,7 @@ onMounted(async () => {
             v-model:value="input.penyakit"
             placeholder="Masukkan nama penyakit yang diprediksi"
             size="large"
-            filterable=""
+            filterable
             :options="listPenyakit"
             :input-props="{
               autocomplete: 'disabled'
