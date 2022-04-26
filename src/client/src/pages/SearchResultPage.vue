@@ -52,6 +52,7 @@ onMounted(async () => {
     result.kemiripan = 0;
     result.date = new Date();
     result.isError = true;
+    result.errMessage = e.response.data.Message;
   }
 
   store.reset();
@@ -66,7 +67,7 @@ const props = computed(() => {
     return {
       status: 'error',
       title: 'Gagal',
-      description: 'Gagal melakukan pencocokan DNA penyakit',
+      description: result.errMessage,
     };
   }
 

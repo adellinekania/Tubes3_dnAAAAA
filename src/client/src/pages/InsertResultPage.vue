@@ -35,6 +35,7 @@ onMounted(async () => {
     result.penyakit = store.data.penyakit;
     result.date = new Date();
     result.isError = true;
+    result.errMessage = e.response.data.Message;
   }
 
   store.reset();
@@ -49,7 +50,7 @@ const props = computed(() => {
     return {
       status: 'error',
       title: 'Gagal',
-      description: 'Data penyakit gagal dimasukkan',
+      description: result.errMessage,
     };
   }
 
