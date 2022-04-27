@@ -39,6 +39,16 @@ const columns = [
       );
     },
   },
+  {
+    title: 'Kemiripan',
+    key: 'kemiripan',
+    render(row) {
+      if (!row.kemiripan) {
+        return '?';
+      }
+      return `${(row.kemiripan * 100).toFixed(2)}%`;
+    },
+  },
 ];
 
 const tableRef = ref(null);
@@ -60,6 +70,7 @@ const fetchData = () => {
           waktu: d.tanggal,
           prediksi: d.prediksi_penyakit,
           result: d.hasil_tes,
+          kemiripan: d.persentase_kemiripan,
         });
       });
     }
