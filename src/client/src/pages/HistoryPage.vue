@@ -117,7 +117,7 @@ const handleChange = () => {
         <template #empty>
           <EmptyStatus
             :error="data.error"
-            @retry="handleClick"
+            @retry="fetchData"
           />
         </template>
       </NDataTable>
