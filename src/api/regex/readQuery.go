@@ -1,6 +1,7 @@
 package regex
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -38,8 +39,18 @@ func ReadQuery(query string) (bool, string, string, string) {
 			i++
 		}
 	}
-
-	arrQuery := splitWord(query)
+	dateQuery := ""
+	penyakit := ""
+	if i != 2 {
+		dateQuery = query[:10]
+		penyakit = query[11:]
+	} else {
+		dateQuery = strings.Join(strings.Split(query, " ")[:3], " ")
+		penyakit = strings.Join(strings.Split(query, " ")[3:], " ")
+	}
+	fmt.Println(dateQuery)
+	fmt.Println(penyakit)
+	arrQuery := splitWord(dateQuery)
 	if valid {
 		m, _ := strconv.Atoi(arrQuery[1])
 		if i != 2 {
@@ -50,7 +61,7 @@ func ReadQuery(query string) (bool, string, string, string) {
 		if err != nil {
 			return false, "Tanggal salah!", "", ""
 		}
-		return true, "Query Benar", newDate, strings.Join(arrQuery[3:], " ")
+		return true, "Query Benar", newDate, penyakit
 	} else {
 		return false, "Format query salah!", "", ""
 	}
