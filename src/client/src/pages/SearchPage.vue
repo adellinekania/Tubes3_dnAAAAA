@@ -121,10 +121,11 @@ onMounted(fetchData);
           <NSelect
             v-model:value="input.penyakit"
             placeholder="Masukkan nama penyakit yang diprediksi"
-            :loading="listPenyakit.isLoading"
             size="large"
             filterable
             :options="listPenyakit"
+            :loading="listPenyakit.isLoading"
+            :disabled="listPenyakit.isLoading"
             :input-props="{
               autocomplete: 'disabled'
             }"
